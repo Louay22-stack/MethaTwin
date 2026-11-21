@@ -360,3 +360,30 @@ Water 40–70 m³/h × 6 or 10 stages × flash pressure 2.0, 2.5 or 3.5 bar: 36 
 - **Permutation importance, CO2 in biomethane:** the flash saturation index is first, then scrubber water.
 - The trained models file (66 MB) is excluded from git; `step6b` regenerates it.
 - Figure: `06_figures/fig06_surrogate_test_performance.png`.
+
+### Step 6 follow-up: overfitting and cascade check (`05_code/step6d_overfitting_check.py`)
+
+The user asked whether R² ≥ 0.99 means overfitting.
+
+**Overfitting check.** Overfitting shows up as a train/test gap, not as a high test score.
+
+- Train R² 0.998–1.000, 5-fold CV R² 0.982–0.998, test R² 0.995–0.999.
+- **The train/test gap is at most 0.0044.** CV and test agree, so there is no overfitting.
+- High scores are expected here: the data come from a deterministic simulation, so there is no measurement noise.
+
+**Honest cascade test.**
+
+- The upgrading surrogates had been evaluated with the true digester outputs as features. They were re-evaluated with the digester surrogates' predictions instead.
+- Test R² was essentially unchanged:
+
+| Output | Test R² (true features) | Test R² (predicted features) |
+|---|---|---|
+| Biomethane | 0.9958 | 0.9959 |
+| CO2 (log) | 0.9994 | 0.9993 |
+| O2 | 0.9990 | 0.9990 |
+| Slip (log) | 0.9970 | 0.9970 |
+| Electricity | 0.9974 | 0.9965 |
+
+- So error propagation through the chain is negligible.
+
+**Caveat.** These scores measure how faithfully the surrogates reproduce the simulator inside the sampled ranges. They do not measure accuracy against real plants; that is limited by the mechanistic models (see the step 4 lab-data check) and by extrapolation outside the design of experiments.
