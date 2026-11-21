@@ -387,3 +387,136 @@ The user asked whether R² ≥ 0.99 means overfitting.
 - So error propagation through the chain is negligible.
 
 **Caveat.** These scores measure how faithfully the surrogates reproduce the simulator inside the sampled ranges. They do not measure accuracy against real plants; that is limited by the mechanistic models (see the step 4 lab-data check) and by extrapolation outside the design of experiments.
+
+## 2026-11-21: Phase 3, step 7 (techno-economics, optimisation, uncertainty)
+
+### Cost data
+
+Source: CRE, Dec 2024 (S17). Values in 2023 euros.
+
+| Item | Value |
+|---|---|
+| CAPEX | 44,456 €/(Nm³/h) for autonomous agricultural plants; average plant ~184 Nm³/h |
+| Economies of scale | −700 to −1,200 €/(Nm³/h) per +10 Nm³/h, which implies a scaling exponent of ~0.61 |
+| CAPEX breakdown | as published by CRE |
+| OPEX breakdown (2022 medians) | inputs 30.7 €/MWh; electricity 8.3; everything else 32.6 |
+| Feed cost (purchase + transport) | CIVE 32.5 + 7.1 €/t; maize 27.9 + 7.8 €/t |
+| Electricity | 9.2 % of the energy produced; price 120 €/MWh |
+| Heat | 3.5 % of the biogas self-consumed |
+| LCOE benchmark | median 129.6 €/MWh (Q1 111.7, Q3 146.0) |
+| Finance | 7 % discount rate, 15 years |
+| Purchase tariff (BI 2023, agricultural) | 111–169 €/MWh, average 152.8 |
+
+### TEA model (`05_code/methatwin/tea.py`)
+
+**Assumptions:**
+
+- A1: CAPEX is split into 4 component groups, each scaled to its own driver with exponent 0.6: digester volume, raw-gas flow, feed tonnage, biomethane capacity.
+- A2: slurry is charged transport only (7.3 €/t). The CRE effluent price of 35.9 €/t, applied to all slurry, would exceed the CRE average total OPEX, so it must describe purchased effluents.
+- A3: electricity = scrubber power from DWSIM + 6 % of the energy produced for other uses.
+- A4: 3.5 % of production is self-used for heat.
+- A5: other OPEX = 32.64 €/MWh (CRE).
+- A6: 8,400 h/yr. No revenue from digestate; CO2 sales only as a scenario.
+
+**A5 history.** The first attempt back-calculated a fixed O&M percentage from the CRE average OPEX. It gave **−0.4 % of CAPEX**, which is impossible, so it was dropped and replaced by the sourced per-MWh value.
+
+### Consistency with CRE (`05_code/step7a_tea_base.py`, full simulation)
+
+Reference plant: base design scaled to 184 Nm³/h.
+
+| Metric | MethaTwin reference | CRE |
+|---|---|---|
+| LCOE | 152.1 €/MWh | median 129.6, Q3 146.0 (4 % above Q3) |
+| Electricity share | 8.8 % | 9.2 % |
+| CAPEX share of full cost | 36 % | ~40 % |
+| Feed cost | 53.5 €/MWh | median 30.7 |
+
+- **Removing the feed-cost excess gives 129.3 €/MWh, which matches the CRE median.**
+- **Why our feed costs more:** CRE reports ~25,000 t/yr of inputs for a 300 Nm³/h plant (~83 t per Nm³/h). Our slurry-rich blend needs ~242 t per Nm³/h.
+- **Base plant (step 4):** 128.7 Nm³/h net, LCOE 159.7 €/MWh, NPV −0.74 M€ at the average tariff.
+- **CO2 sales scenario:** IFRI gives a CO2 price of 0.25–0.35 €/kg and a capture cost of 25–90 €/t. A net value of 160 €/t lowers the reference LCOE to 137.5 €/MWh.
+
+### Optimisation (`05_code/step7b_optimise.py`)
+
+Differential evolution on the surrogates, with LCOE as the objective, followed by full-simulation verification.
+
+**First run** (capacity ≥ target, P(stable) ≥ 0.90):
+
+- Every target returned the largest plant: with economies of scale, a "≥" constraint never binds.
+- 3 of 4 optima were unstable in the full simulation, because they sat on the P(stable) = 0.90 boundary.
+
+**Fixes:**
+
+- Capacity = target ± 1 %.
+- Design margins: P(stable) ≥ 0.97, predicted VFA ≤ 6 g COD/L, predicted pH ≥ 7.0, P(valid) ≥ 0.9.
+
+**Second run:**
+
+- The surrogate overestimated biomethane by 2–5 % at the optima. This is the "optimiser's curse": the search lands where the surrogate is optimistic. As a result the 200 Nm³/h design gave only 194.3 Nm³/h in simulation.
+- **Verify-and-correct loop added:**
+  - if the simulation misses the target, rescale the surrogate target by the shortfall;
+  - if the scrubber fails, raise P(valid);
+  - if the digester is unstable, tighten the VFA margin.
+
+**Confirmed by full simulation:**
+
+| Target | Net biomethane | LCOE | NPV | Iterations |
+|---|---|---|---|---|
+| 150 | 148.7 Nm³/h | 157.2 €/MWh | −0.55 M€ | 5 |
+| 200 | 198.8 Nm³/h | 149.9 €/MWh | +0.48 M€ | 2 |
+| 250 | 250.5 Nm³/h | 145.2 €/MWh | +1.60 M€ | 2 |
+| 300 | 302.9 Nm³/h | 140.2 €/MWh | +3.19 M€ | 5 |
+
+- Break-even at the average tariff is at ~180 Nm³/h.
+- **200 Nm³/h optimum:** maize 15 % (at the legal cap), CIVE 32 %, feed 110 t/d, HRT 108 d, scrubber water 134 m³ per 1,000 Nm³, flash 3.3 bar.
+
+### Value of optimisation and uncertainty (`05_code/step7c_uncertainty.py`)
+
+**Naive scale-up** of the base design to 200 Nm³/h (full simulation): 200.1 Nm³/h, **LCOE 149.6 €/MWh**, NPV +0.54 M€.
+
+- **The optimum is no cheaper (149.9).** The cost surface is flat within the feasible window. Prices drive the economics more than the design variables do.
+- The optimum does satisfy the VFA design margin (6.0 g/L) that the naive design breaks (6.7 g/L).
+
+**Monte Carlo** (10,000 samples at the optimum; surrogates + TEA; distributions listed in the script):
+
+| Result | Value |
+|---|---|
+| LCOE, stable samples | P10 147, P50 166, P90 187 €/MWh |
+| NPV, stable samples | P50 −4.7 M€ |
+| P(NPV > 0) | 13 % |
+| Samples predicted unstable | 17 % |
+
+- The median is pessimistic mainly because the slurry cost is sampled up to the full CRE effluent price.
+
+**Tornado** (swing in LCOE):
+
+| Driver | Swing (€/MWh) |
+|---|---|
+| Slurry cost | 40 |
+| CAPEX | 25 |
+| CIVE cost | 16 |
+| Discount rate | 14 |
+| k_dis | 13 |
+| Other OPEX | 13 |
+| Electricity | 7 |
+| Maize cost | 7 |
+| K_I,nh3 | 6 |
+| Heat self-use | 5 |
+
+- **At K_I,nh3 = 0.0012 the optimum has P(stable) = 0, so the design sits near an ammonia cliff.**
+
+**Surrogate bias.** At this optimum the surrogate LCOE is 145.3 €/MWh against 149.9 in the full simulation, i.e. 3 % optimistic. The Monte Carlo values inherit this bias.
+
+### Robust design (`05_code/step7e_robust.py`)
+
+| Worst-case K_I,nh3 | Result |
+|---|---|
+| 0.0012 | No design confirmed in 4 iterations, all unstable. The DoE confirms it: only 8 % of runs are stable at K_I 0.0012–0.0016, and only 2 reach 195 Nm³/h, with no margin. |
+| 0.0014 | Not confirmed: the best design reached 214 Nm³/h with VFA 7.6 g/L, so no margin. |
+| **0.0016** | **Confirmed:** 202.9 Nm³/h, LCOE 158.3 €/MWh |
+
+- The 0.0016 design also works at nominal kinetics: 205.7 Nm³/h, 156.8 €/MWh.
+- **Price of robustness: +8.4 €/MWh (+5.6 %).** The robust design uses maximum volume (HRT 108 d), CIVE 12.7 % and feed 160 t/d.
+- **Limitation:** the design space has no ammonia-mitigation lever (dilution, NH3 stripping, low-N feeds). These are listed as future work.
+
+Figure: `06_figures/fig07_tea_optimisation.png`.

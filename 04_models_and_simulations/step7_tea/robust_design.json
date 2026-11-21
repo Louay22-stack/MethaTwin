@@ -1,0 +1,302 @@
+{
+  "ki_candidates": [
+    0.0012,
+    0.0014,
+    0.0016,
+    0.0018
+  ],
+  "attempts": {
+    "0.0012": {
+      "history": [
+        {
+          "iteration": 0,
+          "design": {
+            "maize_share": 0.1499999788571461,
+            "cive_share": 0.06448598764066937,
+            "feed_t_d": 159.99999481856352,
+            "hrt_d": 108.04336746353353,
+            "water_per_kNm3": 142.32811942746844,
+            "p_flash_bar": 2.8493381578179022
+          },
+          "simulation": {
+            "status": "digester_unstable"
+          },
+          "surrogate_bm": 187.2860557912873,
+          "surrogate_LCOE": 159.89756674693075
+        },
+        {
+          "iteration": 1,
+          "design": {
+            "maize_share": 0.14999999945919018,
+            "cive_share": 0.06448597670055967,
+            "feed_t_d": 159.99999825359873,
+            "hrt_d": 108.0431883346987,
+            "water_per_kNm3": 142.32853106308798,
+            "p_flash_bar": 2.849329333203079
+          },
+          "simulation": {
+            "status": "digester_unstable"
+          },
+          "surrogate_bm": 187.28606245714383,
+          "surrogate_LCOE": 159.89752141866234
+        },
+        {
+          "iteration": 2,
+          "design": {
+            "maize_share": 0.14999999346107304,
+            "cive_share": 0.06448597613561674,
+            "feed_t_d": 159.9999902382533,
+            "hrt_d": 108.04445862275489,
+            "water_per_kNm3": 142.32822608592082,
+            "p_flash_bar": 2.849336425399436
+          },
+          "simulation": {
+            "status": "digester_unstable"
+          },
+          "surrogate_bm": 187.28606041589896,
+          "surrogate_LCOE": 159.8978061907366
+        },
+        {
+          "iteration": 3,
+          "design": {
+            "maize_share": 0.14999999282732726,
+            "cive_share": 0.06448600053214776,
+            "feed_t_d": 159.9999960324129,
+            "hrt_d": 108.06508202732205,
+            "water_per_kNm3": 142.27724145917614,
+            "p_flash_bar": 2.8594526375759375
+          },
+          "simulation": {
+            "status": "digester_unstable"
+          },
+          "surrogate_bm": 187.08306770950705,
+          "surrogate_LCOE": 160.0295227482904
+        }
+      ],
+      "confirmed": false
+    },
+    "0.0014": {
+      "history": [
+        {
+          "iteration": 0,
+          "design": {
+            "maize_share": 0.14999998785163435,
+            "cive_share": 0.06448596714527277,
+            "feed_t_d": 159.99996541710115,
+            "hrt_d": 103.02597748833094,
+            "water_per_kNm3": 144.02983872492828,
+            "p_flash_bar": 2.780744368869642
+          },
+          "simulation": {
+            "status": "ok",
+            "bm_net_Nm3_h": 173.99370647721565,
+            "LCOE_EUR_MWh": 167.99631284002015,
+            "NPV_EUR": -2195791.6454918906,
+            "BM_CO2_pct": 1.3129518506823439,
+            "BM_O2_ppm": 2040.7725536801163,
+            "CH4_slip_pct": 0.17645438308193678,
+            "pH": 7.607800542223345,
+            "VFA_gCOD_L": 6.945175895337391,
+            "free_NH3_mgN_L": 211.50593125517935,
+            "upg_mass_closure_pct": 0.002737914723727893,
+            "capex_total": 10685098.721684903,
+            "feed_cost": 796744.9771856968
+          },
+          "surrogate_bm": 190.4694186460267,
+          "surrogate_LCOE": 157.14250128372746
+        },
+        {
+          "iteration": 1,
+          "design": {
+            "maize_share": 0.14999998819438254,
+            "cive_share": 0.0784083858350493,
+            "feed_t_d": 159.99999977107854,
+            "hrt_d": 103.02570443142368,
+            "water_per_kNm3": 144.91673668875438,
+            "p_flash_bar": 2.779385093726115
+          },
+          "simulation": {
+            "status": "ok",
+            "bm_net_Nm3_h": 179.67652655689378,
+            "LCOE_EUR_MWh": 166.0184002297687,
+            "NPV_EUR": -1974038.0861440431,
+            "BM_CO2_pct": 1.224258229651056,
+            "BM_O2_ppm": 2063.211172793448,
+            "CH4_slip_pct": 0.17440880927499433,
+            "pH": 7.605329662898104,
+            "VFA_gCOD_L": 7.054026069909449,
+            "free_NH3_mgN_L": 211.812566602496,
+            "upg_mass_closure_pct": 0.0028659610688058727,
+            "capex_total": 10747799.807057148,
+            "feed_cost": 823007.28561052
+          },
+          "surrogate_bm": 196.88074527817804,
+          "surrogate_LCOE": 155.30474773116407
+        },
+        {
+          "iteration": 2,
+          "design": {
+            "maize_share": 0.14999999174170506,
+            "cive_share": 0.15437707377590104,
+            "feed_t_d": 159.99999846524796,
+            "hrt_d": 109.99939316330133,
+            "water_per_kNm3": 146.64147515502953,
+            "p_flash_bar": 2.779459900806858
+          },
+          "simulation": {
+            "status": "ok",
+            "bm_net_Nm3_h": 214.27781153222466,
+            "LCOE_EUR_MWh": 157.59545441697807,
+            "NPV_EUR": -850164.1955408417,
+            "BM_CO2_pct": 1.6594472345130291,
+            "BM_O2_ppm": 2114.923602573499,
+            "CH4_slip_pct": 0.16110332444511555,
+            "pH": 7.599122702672848,
+            "VFA_gCOD_L": 7.602653824792749,
+            "free_NH3_mgN_L": 218.20277249486716,
+            "upg_mass_closure_pct": 0.003124623280472577,
+            "capex_total": 11343619.8707806,
+            "feed_cost": 966308.5388390549
+          },
+          "surrogate_bm": 227.30851491439216,
+          "surrogate_LCOE": 150.65547978885547
+        },
+        {
+          "iteration": 3,
+          "design": {
+            "maize_share": 0.14999997026109002,
+            "cive_share": 0.07840839623819096,
+            "feed_t_d": 159.99998697852607,
+            "hrt_d": 103.0260568173893,
+            "water_per_kNm3": 142.66846846752534,
+            "p_flash_bar": 2.781469221563145
+          },
+          "simulation": {
+            "status": "ok",
+            "bm_net_Nm3_h": 181.36339881565343,
+            "LCOE_EUR_MWh": 166.04471998255542,
+            "NPV_EUR": -1978075.6314843595,
+            "BM_CO2_pct": 2.1461449782896507,
+            "BM_O2_ppm": 2012.3146810407068,
+            "CH4_slip_pct": 0.16904824736571214,
+            "pH": 7.6053300390467085,
+            "VFA_gCOD_L": 7.054018505300059,
+            "free_NH3_mgN_L": 211.81280712341882,
+            "upg_mass_closure_pct": 0.0028902530196875695,
+            "capex_total": 10755766.11867997,
+            "feed_cost": 823007.2096884589
+          },
+          "surrogate_bm": 197.87871212291697,
+          "surrogate_LCOE": 155.51345064848365
+        }
+      ],
+      "confirmed": false
+    },
+    "0.0016": {
+      "history": [
+        {
+          "iteration": 0,
+          "design": {
+            "maize_share": 0.1499987886751252,
+            "cive_share": 0.1001431332118714,
+            "feed_t_d": 157.56623490633388,
+            "hrt_d": 100.63566390692573,
+            "water_per_kNm3": 142.63291685295934,
+            "p_flash_bar": 2.903813461714099
+          },
+          "simulation": {
+            "status": "ok",
+            "bm_net_Nm3_h": 187.2277290858752,
+            "LCOE_EUR_MWh": 161.24295310870292,
+            "NPV_EUR": -1324100.168172745,
+            "BM_CO2_pct": 0.4637595974022575,
+            "BM_O2_ppm": 2044.7365310606642,
+            "CH4_slip_pct": 0.2293297162588243,
+            "pH": 7.6488760505240805,
+            "VFA_gCOD_L": 5.647641767362493,
+            "free_NH3_mgN_L": 234.53823287076693,
+            "upg_mass_closure_pct": 0.0028740701713201,
+            "capex_total": 10676418.859444315,
+            "feed_cost": 850861.5938484875
+          },
+          "surrogate_bm": 202.00648248355466,
+          "surrogate_LCOE": 152.85804214259898
+        },
+        {
+          "iteration": 1,
+          "design": {
+            "maize_share": 0.14999974869248456,
+            "cive_share": 0.12694610965132652,
+            "feed_t_d": 159.60822817420836,
+            "hrt_d": 107.71545602845379,
+            "water_per_kNm3": 142.80534953681604,
+            "p_flash_bar": 2.907276257549611
+          },
+          "simulation": {
+            "status": "ok",
+            "bm_net_Nm3_h": 202.93391556830457,
+            "LCOE_EUR_MWh": 158.32941846479034,
+            "NPV_EUR": -939063.0397215169,
+            "BM_CO2_pct": 0.5504149643923821,
+            "BM_O2_ppm": 2057.8472775401506,
+            "CH4_slip_pct": 0.21767515447566127,
+            "pH": 7.65173147817382,
+            "VFA_gCOD_L": 5.702465521059505,
+            "free_NH3_mgN_L": 240.63205678064145,
+            "upg_mass_closure_pct": 0.0025360349140758466,
+            "capex_total": 11143345.96013941,
+            "feed_cost": 912325.189805753
+          },
+          "surrogate_bm": 215.78361869787162,
+          "surrogate_LCOE": 151.57965715759633
+        }
+      ],
+      "confirmed": true
+    }
+  },
+  "lowest_feasible_K_I_nh3": 0.0016,
+  "final": {
+    "iteration": 1,
+    "design": {
+      "maize_share": 0.14999974869248456,
+      "cive_share": 0.12694610965132652,
+      "feed_t_d": 159.60822817420836,
+      "hrt_d": 107.71545602845379,
+      "water_per_kNm3": 142.80534953681604,
+      "p_flash_bar": 2.907276257549611
+    },
+    "simulation": {
+      "status": "ok",
+      "bm_net_Nm3_h": 202.93391556830457,
+      "LCOE_EUR_MWh": 158.32941846479034,
+      "NPV_EUR": -939063.0397215169,
+      "BM_CO2_pct": 0.5504149643923821,
+      "BM_O2_ppm": 2057.8472775401506,
+      "CH4_slip_pct": 0.21767515447566127,
+      "pH": 7.65173147817382,
+      "VFA_gCOD_L": 5.702465521059505,
+      "free_NH3_mgN_L": 240.63205678064145,
+      "upg_mass_closure_pct": 0.0025360349140758466,
+      "capex_total": 11143345.96013941,
+      "feed_cost": 912325.189805753
+    },
+    "surrogate_bm": 215.78361869787162,
+    "surrogate_LCOE": 151.57965715759633
+  },
+  "robust_design_at_nominal_kinetics": {
+    "status": "ok",
+    "bm_net_Nm3_h": 205.68523430674998,
+    "LCOE_EUR_MWh": 156.75075375199455,
+    "NPV_EUR": -680897.090425428,
+    "BM_CO2_pct": 0.4302244599693347,
+    "BM_O2_ppm": 2049.0172600629903,
+    "CH4_slip_pct": 0.23305170473162864,
+    "pH": 7.689682512365746,
+    "VFA_gCOD_L": 4.31706210606689,
+    "free_NH3_mgN_L": 260.9551350519595,
+    "upg_mass_closure_pct": 0.002538366221195861,
+    "capex_total": 11165419.92858707,
+    "feed_cost": 912325.189805753
+  },
+  "price_of_robustness_EUR_MWh": 8.427390287220817
+}

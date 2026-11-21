@@ -65,3 +65,16 @@ These are snapshots and some ads may have closed. They show which skills employe
 - Total national RNG production capacity in Canada. No authoritative figure was found.
 - Whether Quebec's proposed delay of the 10 % RNG target to 2032 was adopted. This is reported in the press but not confirmed, so it is not used as fact.
 - Whether a QSDsan ADM1 implementation exists. It was not confirmed, so PyADM1 and the BSM2 reference (L2, L3) are used instead.
+
+## Sources added in Phase 3 (execution)
+
+| ID | Source | Used for | Verification |
+|---|---|---|---|
+| S17 | CRE, *Bilan technique et économique des installations de production de biométhane injecté (hors STEP et ISDND)*, Dec 2024 (2023 data). https://cre.fr/fileadmin/Documents/Rapports_et_etudes/2024/Rapport_Bilan_technique_economique_biomethane_injecte.pdf | CAPEX, CAPEX breakdown, OPEX breakdown (p. 57 and p. 72), feed costs, electricity, heat, LCOE benchmark, discount rate and lifetime, tariffs (step 7) | Primary, read (extracted with a document-reading tool) |
+| S18 | GRDF, *Biomethane quality*, ENTSOG gas-quality workshop, 19 Nov 2025. https://www.entsog.eu/sites/default/files/2025-12/S1.2%20GRDF%20-%20Biomethane%20Quality.pdf | Grid-injection specification (step 5) | Primary, read |
+| S19 | Henry's-law constants (Sander 2023 compilation), Wikipedia table: https://en.wikipedia.org/wiki/Henry%27s_law ; NIST Chemistry WebBook, methane: https://webbook.nist.gov/cgi/cbook.cgi?ID=C74828&Mask=10 | Thermodynamics check and kij fit (step 5) | Primary, read |
+| S20 | Décret n° 2016-929 (main crops ≤ 15 % of input tonnage), INERIS AIDA: https://aida.ineris.fr/reglementation/decret-ndeg-2016-929-070716-pris-lapplication-larticle-541-39-code-lenvironnement | Maize cap (steps 3, 6, 7) | Primary, via search |
+| L11 | Klimiuk E. et al. (2015). ADM1-based modeling of anaerobic codigestion of maize silage and cattle manure, Part I. *Arch. Environ. Prot.* 41(3). https://www.journals.pan.pl/Content/86065/PDF/10265-Volume41-Issue3_paper_02.pdf | Feed fractionation, COD factors, measured influent (steps 3 and 4) | Primary, read |
+| L12 | Bułkowska K. et al. (2015). ADM1-based modeling…, Part II: calibration. *Arch. Environ. Prot.* 41(3). https://www.journals.pan.pl//Content/86068/PDF/10265-Volume41-Issue3_paper_03.pdf | Calibrated kinetics and lab-digester check (step 4) | Primary, read |
+| L13 | FNR (2010). *Guide to Biogas – From production to use*, 5th ed. https://energypedia.info/images/4/46/Guide_to_Biogas-_From_Production_to_Use.pdf | Feedstock TS, VS, N and BMP (step 3) | Primary, read (extracted with a document-reading tool) |
+| L14 | Rosen C., Jeppsson U. (2006). *Aspects on ADM1 implementation within the BSM2 framework*. https://iwa-mia.org/wp-content/uploads/2019/04/bmadm1_report061127.pdf | ADM1 equations, parameters and benchmark results (step 4) | Primary, read |
