@@ -136,3 +136,66 @@ This first estimate uses batch BMPs; ADM1 will give continuous-reactor yields la
 - Feed needed for 200 Nm³/h of biomethane: **about 32,300 t/yr (88 t/day)**.
 - Methane share by substrate: slurry 20 %, CIVE 48 %, maize 32 %.
 - **Sensitivity:** using the slurry BMP of 175 instead of 210 raises the slurry f_xi from 0.54 to 0.61.
+
+## 2026-11-21: Phase 3, step 4 (ADM1 digester model)
+
+### Implementation
+
+- `05_code/methatwin/adm1.py`: IWA ADM1 in the BSM2 benchmark form (Rosen & Jeppsson 2006).
+  - Equations, parameters and reference results were read from the public report (iwa-mia.org copy). The influent table was cross-checked with the Lund University copy.
+  - DAE form: the pH and the ionic species are solved algebraically from the charge balance (report §4). This leaves 29 ODE states, solved with BDF and then polished to steady state with fsolve.
+  - The text version of the report has a typo in carbon coefficient s5 (`+Y_ac` instead of `+Y_su·C_bac`). The correct form is used; the closed carbon balance confirms it.
+
+### Validation against BSM2 (`05_code/step4a_adm1_bsm2_validation.py`)
+
+The first two runs failed. Both failures were diagnosed and fixed.
+
+| Run | Result | Diagnosis | Fix |
+|---|---|---|---|
+| 1 | Settled on a soured steady state: pH 5.0, VFA up to 12 g/L, methanogens washed out. COD and N balances were already exact. | ADM1 has multiple steady states. The start had little biomass and almost no buffer, as in a real start-up failure. | Generic inoculated, buffered start: all biomass 1 kg COD/m³, S_IC = S_IN = 0.1. These values are not tuned to the reference. |
+| 2 | 35/36 variables matched. q_gas was −5 %, gas partial pressures −0.25 %. | A hand COD balance of the reference itself shows 4,553 kg COD/d of methane leaving, but q_gas × S_gas,ch4 = 4,805 kg/d. The gas-phase balances must use the headspace flow kp·(P_gas − P_atm); the reported q_gas is that flow corrected to P_atm (× P_gas/P_atm). | Headspace flow used in the balances; the corrected flow is used for reporting only. |
+| 3 | **36/36 variables within 1 %; maximum error 1.8e-5 %.** COD, N and C balances closed to < 1e-6 %. | — | — |
+
+### Calibrated kinetics for agricultural feed
+
+- Source: Bułkowska et al. (2015, Part II, open access), maize silage + cattle manure, 39 °C, HRT 45 d.
+- Values used: k_dis 0.1 d⁻¹ (5× slower than BSM2), K_S,c4 0.23, K_I,h2,c4 1e-8, k_m,pro 8.5, K_S,pro 0.15, K_I,h2,pro 2.4e-8, k_m,ac 7.64, K_S,ac 0.6.
+- **K_I,nh3 exception.** Their calibrated value of 0.00026 was fitted on a feed with only 0.019 kmol NH4-N/m³. In our slurry blend it makes the digester sour (pH 4.6), as the sensitivity run shows. The BSM2 value of 0.0018 is used for the base case, with the literature range 0.00026–0.0084 carried as an uncertainty.
+- Their paper's text says 0.0026 once, while Table 5 and the conclusions say 0.00026; the table value is taken.
+
+### Check against measured lab data (`05_code/step4c`)
+
+Klimiuk/Bułkowska lab digester: 100 L, 39 °C, HRT 45 d, measured influent from Part I Table 5. No parameter was adjusted. The measured values were read from the paper's figure data, so they are approximate.
+
+| Output | Model | Measured | Within range? |
+|---|---|---|---|
+| CH4 | 53.6 % | 50–58 % | Yes |
+| pH | 7.19 | 6.8–7.4 | Yes |
+| Propionate | 0.69 kg COD/m³ | 0.3–0.9 | Yes |
+| Biogas, dry at normal conditions | 83 Ndm³/d | 65–100 (mean ~78) | Yes |
+| Biogas, wet at 39 °C | 102 dm³/d | 65–100 | Slightly above (the measurement basis is not stated) |
+| Acetate | 0.85 kg COD/m³ | 0.2–0.6 | **No**: over-predicted by ~40 % above the top of the range |
+
+### MethaTwin base case (`05_code/step4b`)
+
+- Conditions: HRT 60 d, 39 °C, 5,307 m³ digester, OLR 2.9 kg VS/m³/d.
+- Methane: **132 Nm³/h**, equivalent to 136 Nm³/h of biomethane, against the **200 target**.
+  - CH4 yield 207 Nm³/t VS, which is 71 % of the batch BMP. The step-3 tonnage assumed 100 %, so the plant is undersized.
+- Gas and stability: 56.9 % CH4, pH 7.61.
+- **Ammonia stress:** TAN 3.9 g N/L, free NH3 214 mg N/L (I_nh3 = 0.11). VFA 6.9 g COD/L, mostly acetate.
+- 34 kg COD/m³ of composite is still undigested in the digestate, which is the case for a post-digester.
+
+### One-at-a-time sensitivity of CH4 output (Nm³/h)
+
+| Case | CH4 |
+|---|---|
+| Base case | 132 |
+| K_I,nh3 = 0.00026 | 0 (digester sours) |
+| K_I,nh3 = 0.0084 | 140 (VFA 0.9 g/L) |
+| k_dis = 0.5 (BSM2 default) | 149 |
+| HRT 45 d | 123 |
+| HRT 90 d | 142 |
+
+**Conclusion:** the model is verified (benchmark and balances) and is consistent with measured data, except for acetate. The base design cannot reach the target in a single CSTR. Feed rate, HRT and a post-digester are the levers for the optimisation step.
+
+- Figure: `06_figures/fig04_adm1_validation_and_base_case.png`.

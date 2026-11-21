@@ -1,0 +1,22 @@
+{
+  "n_variables": 36,
+  "n_pass": 36,
+  "max_abs_rel_err_pct": 1.7645153224514942e-05,
+  "worst_variable": "S_h2",
+  "balances": {
+    "COD_in_kg_d": 9706.321701699997,
+    "COD_out_kg_d": 9706.321704860762,
+    "COD_closure_pct": -3.256398474334997e-08,
+    "N_closure_pct": 1.7944945322995786e-06,
+    "C_closure_pct": 2.1858054140292645e-07
+  },
+  "solve_time_s": 0.4277771999986726,
+  "solver_info": {
+    "t_end": 300.0,
+    "n_rhs": 2154,
+    "max_rel_rate_after_integration": 7.070870760586583e-07,
+    "polished": false,
+    "polish_msg": "The iteration is not making good progress, as measured by the \n improvement from the last ten iterations.",
+    "max_abs_rhs": 1.1701166771627136e-09
+  }
+}

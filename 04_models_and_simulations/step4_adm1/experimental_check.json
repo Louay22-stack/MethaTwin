@@ -1,0 +1,71 @@
+{
+  "comparison": {
+    "biogas_dm3_d": {
+      "model": 101.98082661601167,
+      "measured_range": [
+        65,
+        100
+      ],
+      "measured_mean_approx": 78,
+      "within_range": false,
+      "dev_from_mean_pct": 30.744649507707265
+    },
+    "CH4_pct": {
+      "model": 53.5763763306241,
+      "measured_range": [
+        50,
+        58
+      ],
+      "measured_mean_approx": 55,
+      "within_range": true,
+      "dev_from_mean_pct": -2.5884066715925447
+    },
+    "pH": {
+      "model": 7.18535558794037,
+      "measured_range": [
+        6.8,
+        7.4
+      ],
+      "measured_mean_approx": 7.1,
+      "within_range": true,
+      "dev_from_mean_pct": 1.2021913794418313
+    },
+    "S_ac_kgCOD_m3": {
+      "model": 0.8513890246027415,
+      "measured_range": [
+        0.2,
+        0.6
+      ],
+      "measured_mean_approx": 0.35,
+      "within_range": false,
+      "dev_from_mean_pct": 143.2540070293547
+    },
+    "S_pro_kgCOD_m3": {
+      "model": 0.6901660153211239,
+      "measured_range": [
+        0.3,
+        0.9
+      ],
+      "measured_mean_approx": 0.65,
+      "within_range": true,
+      "dev_from_mean_pct": 6.179386972480592
+    }
+  },
+  "model_extra": {
+    "biogas_dry_Ndm3_d": 83.44962115737926
+  },
+  "balances": {
+    "COD_in_kg_d": 0.29056248000000007,
+    "COD_out_kg_d": 0.29056248000000007,
+    "COD_closure_pct": 0.0,
+    "N_closure_pct": 0.0,
+    "C_closure_pct": 0.0
+  },
+  "solver": {
+    "t_end": 675.6756756756756,
+    "n_rhs": 2220,
+    "max_rel_rate_after_integration": 1.1552103519173457e-08,
+    "polished": true,
+    "max_abs_rhs": 2.0358714714063808e-14
+  }
+}
