@@ -282,3 +282,81 @@ Water 40–70 m³/h × 6 or 10 stages × flash pressure 2.0, 2.5 or 3.5 bar: 36 
 - Figure: `06_figures/fig05_upgrading_hpws.png`
 
 **Out of scope, as assumptions:** H2S removal (assumed upstream biological desulfurisation plus activated carbon), drying to the −5 °C dew point (TSA or PSA), and compressor and blower motor efficiencies (shaft power is reported). The chiller COP of 3 is an assumption.
+
+## 2026-11-21: Phase 3, step 6 (coupled plant, design of experiments, ML surrogates)
+
+### Coupled model
+
+`05_code/methatwin/plant.py` chains the steps: feed blend → ADM1 (step 4, calibrated kinetics, 39 °C) → digester stability screen → DWSIM water scrubbing (step 5, 10 stages).
+
+- One coupled run takes 2–7 s.
+- The base case reproduces steps 4 and 5: 132.6 Nm³/h CH4 and 133.4 Nm³/h of biomethane.
+- **Stability screen (an assumption):** pH ≥ 6.8 and total VFA ≤ 8 g COD/L. These are screening thresholds chosen for this study, not values from a source.
+
+### Design of experiments
+
+`05_code/step6a_doe.py`: 2,000 Latin-hypercube samples (seed 42) over 8 inputs.
+
+| Input | Range | Note |
+|---|---|---|
+| Maize share | 0–0.15 | décret 2016-929 cap |
+| CIVE share | 0.05–0.45 | |
+| Feed rate | 60–160 t/d | |
+| HRT | 40–110 d | |
+| Scrubber water | 100–200 m³/h per 1,000 Nm³/h of raw biogas | |
+| Flash pressure | 2.0–3.5 bar | |
+| k_dis | 0.05–0.5 d⁻¹, log-uniform | uncertain parameter |
+| K_I,nh3 | 0.0012–0.0084, log-uniform | uncertain parameter |
+
+- Run in 3 parallel processes (limited by about 2.5 GB of free RAM), resumable, with results written row by row: **18.6 min for 2,000 runs**.
+- **Status of the runs:**
+
+| Status | Runs |
+|---|---|
+| OK | 1,341 |
+| Digester unstable | 407 |
+| Scrubber not converged | 145 |
+| Absorber non-physical result (caught by the step 5 check) | 107 |
+
+### Data-quality issue found
+
+- **Symptom:** 117 "OK" runs (8.7 %) had scrubber mass closures of 0.2–6.7 %. All of them were at a low flash pressure (2.0–2.7 bar) combined with high water flow.
+- **Diagnosis:** the absorber column alone loses about 0.02 kg/s. That is 0.13 % of the column's water-dominated flow, but about 6.7 % of the gas flow. DWSIM's column solver judges convergence against the total flow, with default tolerances of 1e-5.
+- **Tighter tolerances (1e-6 to 1e-9) make the solver fail** (it gives the all-liquid result) in this regime.
+- **Decision:** a data-quality gate. A run counts as valid only if the scrubber mass closure is within 0.1 %. The raw CSV keeps every run; the gate is applied in `step6b` and is now also in `plant.py`.
+- A classifier, `upgrading_valid`, learns where the simulator is reliable.
+- **Valid set: 1,224 fully upgraded runs.**
+
+### Machine-learning surrogates (`05_code/step6b_surrogate.py`)
+
+- 80/20 split (seed 42). The test set was never used for tuning.
+- Hyperparameters chosen by RandomizedSearchCV with 5-fold cross-validation, comparing RandomForest, XGBoost and MLP (StandardScaler + MLPRegressor, with a scaled target).
+- Log10 targets for CO2 % and slip %. Log10 of the two log-uniform inputs.
+- **Physics-informed cascade for the scrubber models:** besides the 8 inputs, the models get the digester outputs (biogas flow and CH4 fraction) and a flash saturation index, (1 − y_CH4) × 1000 / water_per_kNm3 / p_flash.
+  - On 1,045 samples this raised R² for CO2 from 0.70 to 0.996 (log scale) and for slip from 0.39 to 0.968 (log scale).
+  - The index is the most important input for CO2 (permutation importance).
+
+**Held-out test results:**
+
+| Model | Best family | Test score |
+|---|---|---|
+| CH4 production | MLP | R² 0.998 |
+| Biogas CH4 fraction | MLP | R² 0.995 |
+| pH | XGB | R² 0.995 |
+| VFA | XGB | R² 0.996 |
+| Free NH3 | XGB | R² 0.995 |
+| Biomethane flow | MLP | R² 0.996 |
+| CO2 in biomethane | XGB | R² 0.998 (log 0.999) |
+| O2 in biomethane | XGB | R² 0.999 |
+| CH4 slip | RF | R² 0.992 (log 0.997) |
+| Scrubber electricity | XGB | R² 0.997 |
+| Classifier: digester stable | XGB | AUC 0.999, accuracy 98.5 % |
+| Classifier: upgrading valid | XGB | AUC 0.930, accuracy 89 % |
+| Classifier: spec OK | RF | AUC 0.9998, accuracy 99.2 % |
+
+- **Objective O3 met:** R² ≥ 0.95 on held-out data for every target. LCOE will be computed from these outputs in step 7.
+- **Speed:** one coupled simulation takes 1.7 s on average; all 13 surrogates together take 0.74 ms per point in batch mode (**about 2,300×**). For a single point it is 48 ms (36×), because of per-call overhead.
+- **Permutation importance, CH4 production:** feed rate is first, then CIVE share, maize share, k_dis, HRT and K_I,nh3. Scrubber variables have no effect, which is correct.
+- **Permutation importance, CO2 in biomethane:** the flash saturation index is first, then scrubber water.
+- The trained models file (66 MB) is excluded from git; `step6b` regenerates it.
+- Figure: `06_figures/fig06_surrogate_test_performance.png`.

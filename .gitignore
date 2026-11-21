@@ -16,3 +16,6 @@ desktop.ini
 03_data/raw/**/*.parquet
 04_models_and_simulations/**/runs/
 *.log
+
+# Trained surrogate models (66 MB): regenerate with python 05_code/step6b_surrogate.py
+04_models_and_simulations/step6_surrogate/models/

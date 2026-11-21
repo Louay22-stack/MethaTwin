@@ -1,0 +1,7 @@
+{
+  "mean_coupled_simulation_s": 1.7267560442811147,
+  "surrogate_single_point_all_models_s": 0.04835941249999451,
+  "surrogate_batch_per_point_s": 0.0007400322448918406,
+  "speedup_single": 35.70672088461188,
+  "speedup_batch": 2333.352439978462
+}
