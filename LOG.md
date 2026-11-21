@@ -536,3 +536,13 @@ Figure: `06_figures/fig07_tea_optimisation.png`.
 - **Noted while checking the results:** the 300 Nm³/h optimum sits at the upper feed bound (160 t/d) and its simulated VFA (6.4 g/L) slightly exceeds the 6.0 g/L margin applied to the surrogate. Stated in the report.
 - Layout was checked by rendering every page to images (PyMuPDF, already installed). `pypdfium2` was also installed for this before PyMuPDF was found; neither is needed to build the report.
 - README rewritten: key results, code map, full run order, requirements and limitations.
+
+## 2026-11-21: Interactive dashboard and logo
+
+- The user asked for a professional dashboard so that they, or a recruiter, can test the models, plus a logo.
+- **Logo** (`05_code/dashboard/assets/logo.svg`, `logo_mark.svg`): a drop / leaf split in two. The solid left half is the physical plant (biology); the right half is drawn as an outline with circuit traces ending in amber nodes, the digital twin. Wordmark "Metha" in ink, "Twin" in teal.
+- **Palette** (`theme.py`): ink #0B1F2A, brand teal #0E8A6E, flame amber accent. Chart categorical slots teal / blue / amber / violet were checked with a colour-vision validator: all pass, worst adjacent CVD separation dE 19.6. Amber is below 3:1 contrast on white, so it is always used with visible labels.
+- **App** (`05_code/dashboard/`, Streamlit 1.55 + Plotly 6.8): `core.py` reuses the surrogates and the TEA with the same HHV formula, bounds and Monte Carlo distributions as step 7; `app.py` has six tabs (simulator, design explorer, risk, optimisation, validation, about). Sliders are limited to the DoE ranges, where the surrogates are valid.
+- **Honesty features:** a validity warning when the simulator-validity classifier is below 0.5; for saved designs, the full-simulation result is shown next to the surrogate prediction (e.g. the 200 Nm³/h optimum: surrogate 208 vs simulated 198.8 Nm³/h).
+- **Checks:** the model layer reproduces the step 7c Monte Carlo at the 200 Nm³/h optimum (P10/P50/P90 147.7 / 166.5 / 186.7 €/MWh vs 147 / 166 / 187 in the report) and the tornado nominal 145.3 €/MWh. Every tab was opened in a browser at 1440×900; label overlaps and table styling were fixed; the server log shows no errors or warnings.
+- Not done: online hosting. It needs an account (Streamlit Community Cloud or Hugging Face Spaces) that the user must create, and the 66 MB model file is not in git.

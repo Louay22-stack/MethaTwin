@@ -1,4 +1,5 @@
-# MethaTwin
+<p><img src="05_code/dashboard/assets/logo.svg" alt="MethaTwin" width="300"/></p>
+
 
 **MethaTwin** is a machine-learning-accelerated digital twin of an agricultural biomethane plant (~200 Nm³/h), from the digester to the gas grid. It is built from public data and open-source tools only.
 
@@ -9,6 +10,29 @@
 5. **Economics:** a techno-economic model anchored on the French regulator's (CRE) 2024 cost survey, with surrogate-based optimisation verified by full simulation, Monte Carlo and robustness analysis.
 
 **Final report:** [`07_report/MethaTwin_Final_Report.pdf`](07_report/MethaTwin_Final_Report.pdf)
+
+## Interactive dashboard
+
+A Streamlit web app lets anyone test the digital twin without DWSIM: move sliders for the feed blend, plant size, scrubber settings, microbial kinetics and prices, and see biomethane output, gas quality against the grid specification, digester stability, cost per MWh and NPV update instantly. It runs on the ML surrogates (milliseconds per design).
+
+| Tab | What it shows |
+|---|---|
+| Plant simulator | Verdict banner, KPI cards, digester health, gas quality vs spec, cost and CAPEX breakdown; full-simulation check for saved designs |
+| Design explorer | One-input sweeps (cost, output, acids, CO₂) and a feed-rate × retention-time cost map |
+| Risk analysis | Live Monte Carlo (500–5,000 samples) and tornado chart for the current design |
+| Optimisation | Verified optimal designs, economies of scale, one-click loading into the simulator |
+| Model validation | Benchmark, lab-data, market and surrogate checks |
+| About | Method, limitations, report download |
+
+```powershell
+pip install -r requirements.txt
+```
+
+```powershell
+streamlit run 05_code/dashboard/app.py
+```
+
+The dashboard needs the trained models; if `04_models_and_simulations/step6_surrogate/models/surrogates.joblib` is missing, run `python 05_code/step6b_surrogate.py` first. Code: `05_code/dashboard/` (`app.py` interface, `core.py` model layer, `theme.py` palette and styles, `assets/` logo).
 
 ## Key results
 
@@ -46,6 +70,7 @@
 | `methatwin/surrogate.py` | Loads and runs the cascaded surrogates |
 | `methatwin/tea.py` | CAPEX, OPEX, LCOE and NPV |
 | `dwsim_bridge.py` | Loads DWSIM (.NET 10) into Python through pythonnet / CoreCLR |
+| `dashboard/` | Streamlit dashboard (interface, model layer, brand theme, logo) |
 
 ## Reproducing the work
 
