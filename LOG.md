@@ -546,3 +546,59 @@ Figure: `06_figures/fig07_tea_optimisation.png`.
 - **Honesty features:** a validity warning when the simulator-validity classifier is below 0.5; for saved designs, the full-simulation result is shown next to the surrogate prediction (e.g. the 200 Nm³/h optimum: surrogate 208 vs simulated 198.8 Nm³/h).
 - **Checks:** the model layer reproduces the step 7c Monte Carlo at the 200 Nm³/h optimum (P10/P50/P90 147.7 / 166.5 / 186.7 €/MWh vs 147 / 166 / 187 in the report) and the tornado nominal 145.3 €/MWh. Every tab was opened in a browser at 1440×900; label overlaps and table styling were fixed; the server log shows no errors or warnings.
 - Not done: online hosting. It needs an account (Streamlit Community Cloud or Hugging Face Spaces) that the user must create, and the 66 MB model file is not in git.
+
+## 2026-11-21: Application UI/UX redesign (v2)
+
+**Brief.** The user asked for a complete redesign as industrial biotech software, using Reverion and CRecTech as references, while keeping every function and leaving the science untouched.
+
+**References studied (browser, computed styles).**
+- Reverion: flat deep-petrol surfaces (#004841, #1E685A), mint (#96E7BC) and coral (#F58768) accents, a grotesk sans with Space Mono for navigation, mono nav labels split by thin vertical rules, 1px line art, no gradients. Non-essential cookies were declined.
+- CRecTech (crectech.net, found by search): deep forest (#1A2E1F), green (#1D8348), pale mint canvas, two-tone headlines (Montserrat), DM Sans body, offset colour blocks.
+
+**Weaknesses found in v1.**
+1. A gradient hero banner used about 120 px; rounded cards with coloured stripes repeated everywhere, a generic template look.
+2. Six `st.tabs` executed on every rerun, so the Monte Carlo, the 1,476-point map and the tornado ran on each slider move.
+3. There was no view of the process itself.
+4. Inputs were buried in collapsed expanders, with no sign of what changed from the reference.
+5. Tables were static HTML; there was no sorting, filtering, selection or export.
+6. There was no scenario comparison, and no explicit loading, empty or out-of-date states.
+7. Mobile layout: hero tags wrapped and the four-card grid was cramped.
+
+**v2 design system (`theme.py`).**
+- Colours: sage-cream canvas, white work surfaces, a petrol application bar, MethaTwin teal for the brand.
+- Coral marks only the current design and attention; status green, amber and red always come with an icon and a word.
+- Type: Space Grotesk for headings and numbers, Inter for body text, IBM Plex Mono for labels, units and tags.
+- Structure comes from 1 px rules and a 4 px maximum radius.
+- Chart slots teal, blue, coral and violet pass the colour-vision validator (worst adjacent CVD dE 19.6). Petrol #12705F failed the chroma floor, so brand teal was kept for charts.
+
+**Architecture.**
+- Multipage `st.navigation` with a custom instrument-strip navigation; pages are deep-linkable at /explorer, /risk, /designs, /validation and /docs.
+- Shared design console in the sidebar. `state.py` holds session state, `ui.py` the components, `views/` one file per page.
+- Only the visible page computes. Evaluations are cached by input fingerprint.
+
+**New interactions (all functional).**
+- Live process flow diagram (SVG): stream values, unit status colours, hover tooltips, animated flow lines (off under reduced motion).
+- Constraint tables with position-vs-limit gauges.
+- "Modified" flags on input groups.
+- Save-scenario dialog, toasts, popover for the Monte Carlo distributions.
+- Risk runs on demand, with status progress and explicit empty and out-of-date states.
+- Explorer: pill selector for the sweep; the map has selectable axes and metric and reruns in a fragment.
+- Selectable data tables: load a verified design or scenario, multi-select to compare, delete.
+- CSV and JSON exports, filterable validation chain, searchable glossary.
+- An error state when the models are missing.
+
+**Unchanged.**
+- `core.py` and `05_code/methatwin/` (models, TEA, Monte Carlo); `git diff` on them is empty.
+- All v1 features are kept: presets, sweeps, map, Monte Carlo, tornado, optima, comparisons, validation, report download.
+
+**Tested in the browser at 1440×900, tablet 768×1024 and mobile 375×812.** Problems found and fixed:
+1. The global font override replaced Streamlit icon glyphs with their names ("expand_more").
+2. The toolbar was hidden, which also removed the open-sidebar button.
+3. A fixed sidebar minimum width left a blank gutter when the sidebar was collapsed.
+4. Spec tables overflowed on phones; they now scroll inside their panel, and the diagram scrolls horizontally.
+5. Primary-button text contrast on hover was too low.
+6. Loading a design from a table errored because widget state cannot change after render; it now uses `on_click` callbacks.
+
+The server log shows no errors.
+
+**Note.** Scenarios live in the browser session; reloading the URL starts a new session.

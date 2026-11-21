@@ -11,18 +11,18 @@
 
 **Final report:** [`07_report/MethaTwin_Final_Report.pdf`](07_report/MethaTwin_Final_Report.pdf)
 
-## Interactive dashboard
+## Interactive application
 
-A Streamlit web app lets anyone test the digital twin without DWSIM: move sliders for the feed blend, plant size, scrubber settings, microbial kinetics and prices, and see biomethane output, gas quality against the grid specification, digester stability, cost per MWh and NPV update instantly. It runs on the ML surrogates (milliseconds per design).
+MethaTwin ships as an interactive web application (Streamlit) that anyone can use without DWSIM. A **design console** on the left holds every input (feed blend, feed rate, retention time, scrubber settings, microbial kinetics, prices); six pages read from it. All live values come from the ML surrogates (milliseconds per design); saved designs also show their full-simulation results.
 
-| Tab | What it shows |
+| Page | What it does |
 |---|---|
-| Plant simulator | Verdict banner, KPI cards, digester health, gas quality vs spec, cost and CAPEX breakdown; full-simulation check for saved designs |
-| Design explorer | One-input sweeps (cost, output, acids, CO₂) and a feed-rate × retention-time cost map |
-| Risk analysis | Live Monte Carlo (500–5,000 samples) and tornado chart for the current design |
-| Optimisation | Verified optimal designs, economies of scale, one-click loading into the simulator |
-| Model validation | Benchmark, lab-data, market and surrogate checks |
-| About | Method, limitations, report download |
+| Plant cockpit | Feasibility verdict, instrument readouts, **live process flow diagram** with stream values and unit status, constraint tables with position-vs-limit gauges, cost build-up, JSON export |
+| Design explorer | One-input sweeps (cost, output, acids, CO₂) and a two-input response map with selectable axes and metric |
+| Risk analysis | On-demand Monte Carlo (500–5,000 samples) with run / out-of-date / empty states, NPV and LCOE distributions, tornado, sample explorer, CSV export |
+| Designs & scenarios | Register of verified designs (select a row to load it), economies of scale; save, compare, reload and export your own scenarios |
+| Model validation | Filterable validation chain, sortable surrogate accuracy table (train / CV / test), lab and market checks |
+| Documentation | Workflow, methods, searchable glossary, limitations, report download |
 
 ```powershell
 pip install -r requirements.txt
@@ -32,7 +32,9 @@ pip install -r requirements.txt
 streamlit run 05_code/dashboard/app.py
 ```
 
-The dashboard needs the trained models; if `04_models_and_simulations/step6_surrogate/models/surrogates.joblib` is missing, run `python 05_code/step6b_surrogate.py` first. Code: `05_code/dashboard/` (`app.py` interface, `core.py` model layer, `theme.py` palette and styles, `assets/` logo).
+The application needs the trained models; if `04_models_and_simulations/step6_surrogate/models/surrogates.joblib` is missing, run `python 05_code/step6b_surrogate.py` first (the app shows this instruction instead of crashing).
+
+Code: `05_code/dashboard/`: `app.py` (shell: app bar, navigation, design console), `state.py` (session state, scenarios, cached evaluations), `core.py` (model layer: surrogates + TEA), `ui.py` (components and the process flow diagram), `theme.py` (design tokens, CSS, chart template), `views/` (one file per page), `assets/` (logo).
 
 ## Key results
 
@@ -70,7 +72,7 @@ The dashboard needs the trained models; if `04_models_and_simulations/step6_surr
 | `methatwin/surrogate.py` | Loads and runs the cascaded surrogates |
 | `methatwin/tea.py` | CAPEX, OPEX, LCOE and NPV |
 | `dwsim_bridge.py` | Loads DWSIM (.NET 10) into Python through pythonnet / CoreCLR |
-| `dashboard/` | Streamlit dashboard (interface, model layer, brand theme, logo) |
+| `dashboard/` | Interactive application (shell, state, model layer, components, pages, theme, logo) |
 
 ## Reproducing the work
 
