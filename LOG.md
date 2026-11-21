@@ -61,3 +61,23 @@
 - Added `.gitkeep` files so that empty folders exist in a fresh clone.
 - Made the first commit with all Phase 1 and 2 material.
 - Not done yet: a LICENSE file and a GitHub remote. Both are the user's choice; nothing has been pushed.
+
+## 2026-11-21: Phase 3, step 2 (day-1 test: driving DWSIM from Python 3.14)
+
+- **Finding.** DWSIM 10.2.11 (Avalonia build) is a .NET 10 application, not .NET Framework. It ships its own runtime (10.0.12), and the system also has .NET 10.0.11.
+- **Approach.** pythonnet 3.2.1 is run in `coreclr` mode, using a minimal runtimeconfig that targets net10.0 and rolls forward to the latest patch. An AssemblyResolve handler loads DWSIM's DLLs from its install folder. This is reusable as `05_code/dwsim_bridge.py`.
+- **Test.** `05_code/step2_dwsim_smoke_test.py` compresses raw biogas (360 Nm³/h, 55/45 mol% CH4/CO2, 35 °C, 1.013 bar) to 10 bar with an adiabatic efficiency of 75 % (Peng-Robinson). The result is compared with an independent hand calculation: ideal-gas isentropic compression with NIST Shomate cp(T).
+- **Bug caught by the hand calculation.** The first run gave 4,477 kW and 6,428 °C, against 44.9 kW expected.
+  - Cause: DWSIM's `AdiabaticEfficiency` is in **percent** (default 75.0), so 0.75 was read as 0.75 %.
+  - Fix: the script now passes `ETA_AD*100`, with a comment in the code.
+  - Lesson: every DWSIM input unit is checked against its default value before use.
+- **Final result.**
+  - Power: DWSIM 44.77 kW vs hand calculation 44.89 kW (−0.26 %).
+  - Outlet temperature: 274.5 °C vs 273.6 °C (+0.9 K).
+  - Mass balance: closes exactly (0.0 %).
+  - Feed mass flow vs hand calculation: −0.002 %.
+  - Solve time: about 0.2 s.
+- **Conclusion.** Driving DWSIM from Python 3.14 works, so the fallback is not needed.
+  - DWSIM has an Absorption Column (usable for water scrubbing) but no membrane unit; a membrane option would need a Python unit model, as planned.
+  - A single compression stage to 10 bar gives 274 °C, which is too hot. The real upgrading design will use two-stage compression with intercooling.
+- Outputs: `04_models_and_simulations/step2_smoke_test/results.json` and `smoke_test.dwxmz`, a flowsheet that can be opened in the DWSIM GUI.

@@ -1,0 +1,34 @@
+{
+  "case": {
+    "flow_Nm3_h": 360.0,
+    "molar_flow_mol_s": 4.46149727848666,
+    "y_CH4": 0.55,
+    "T_in_C": 35.0,
+    "P_in_bar": 1.01325,
+    "P_out_bar": 10.0,
+    "eta_adiabatic": 0.75,
+    "property_package": "Peng-Robinson (PR)"
+  },
+  "dwsim": {
+    "errors": [],
+    "solve_time_s": 0.20602169999619946,
+    "saved_flowsheet": true,
+    "T_out_C": 274.4968605828659,
+    "P_out_bar": 10.0,
+    "power_kW": 44.76942029206973,
+    "mass_in_kg_h": 459.7995038815027,
+    "mass_out_kg_h": 459.7995038815027
+  },
+  "hand_calc_ideal_gas": {
+    "T2s_C": 219.42122989418846,
+    "T2_C": 273.55315102901545,
+    "power_kW": 44.88788433225704,
+    "mass_flow_kg_h": 459.80788792718835
+  },
+  "checks": {
+    "mass_balance_error_pct": 0.0,
+    "feed_mass_flow_vs_hand_pct": -0.001823380134571949,
+    "power_dev_pct": -0.2639109460148371,
+    "T_out_dev_K": 0.9437095538504536
+  }
+}
