@@ -1,0 +1,4 @@
+feedstock,TS_pct_FM,VS_pct_TS,VS_kg_per_t_FM,ThOD_kgCOD_per_kgVS,BMP_measured_Nm3_per_tVS,BMP_max_Nm3_per_tVS,degradability_D,f_pr,f_li,f_ch,f_xi,X_pr_kgCOD_m3,X_li_kgCOD_m3,X_ch_kgCOD_m3,X_I_kgCOD_m3,S_IN_kmolN_m3,COD_total_kg_m3,CH4_Nm3_per_t_FM
+cattle_slurry,10,80,80,1.297,210,454.3,0.4623,0.1879,0.08845,0.1859,0.5377,19.5,9.178,19.29,55.8,0.1785,103.8,16.8
+cive_silage,35,90,315,1.289,310,451.6,0.6865,0.2065,0.07399,0.406,0.3135,83.87,30.05,164.9,127.3,0,406.2,97.65
+maize_silage,33,95,313.5,1.309,340,458.4,0.7417,0.1198,0.1211,0.5008,0.2583,49.15,49.7,205.5,106,0,410.3,106.6

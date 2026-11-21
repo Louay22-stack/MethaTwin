@@ -1,0 +1,39 @@
+{
+  "basis": {
+    "biomethane_Nm3_h": 200.0,
+    "y_CH4": 0.97,
+    "hours_per_yr": 8400.0,
+    "note": "CH4 from measured BMP (batch, complete); continuous digester yield comes from ADM1 later"
+  },
+  "fm_shares": {
+    "cattle_slurry": 0.6,
+    "cive_silage": 0.25,
+    "maize_silage": 0.15
+  },
+  "maize_cap_respected": true,
+  "blend_VS_kg_per_t": 173.775,
+  "blend_CH4_Nm3_per_t": 50.481,
+  "blend_COD_fractions": {
+    "X_pr": 0.17766949140529775,
+    "X_li": 0.09085336810308633,
+    "X_ch": 0.3711111543296835,
+    "X_I": 0.3603659861619324
+  },
+  "CH4_needed_Nm3_yr": 1629600.0,
+  "feed_t_per_yr": 32281.452427646043,
+  "feed_t_per_day": 88.44233541820834,
+  "feed_by_substrate_t_per_yr": {
+    "cattle_slurry": 19368.871456587625,
+    "cive_silage": 8070.363106911511,
+    "maize_silage": 4842.217864146906
+  },
+  "methane_share_by_substrate": {
+    "cattle_slurry": 0.19967908718131575,
+    "cive_silage": 0.48359778926724906,
+    "maize_silage": 0.31672312355143517
+  },
+  "sensitivity_slurry_BMP_175": {
+    "f_xi": 0.6147735605636309,
+    "CH4_Nm3_per_t_FM": 14.0
+  }
+}

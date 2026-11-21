@@ -1,0 +1,63 @@
+feedstock,parameter,value,low,high,unit,source_id,location_in_source,note
+cattle_slurry,TS,10,6,11,% FM,D1,Table 4.1 p.75,average and range
+cattle_slurry,VS,80,75,82,% TS,D1,Table 4.1 p.75,
+cattle_slurry,N_total,3.5,2.6,6.7,% TS,D1,Table 4.1 p.75,
+cattle_slurry,NH4_N,,1,4,% TS,D1,Table 4.1 p.75,no average given in source
+cattle_slurry,CH4_yield_FM,14,11,19,Nm3 CH4/t FM,D1,Table 4.2 p.75,
+cattle_slurry,BMP_VS,210,110,275,Nm3 CH4/t VS,D1,Table 4.2 p.75,
+cattle_slurry,protein,14.1,,,% TS,D2,Results text (citing Biernacki et al. 2013),liquid cattle manure
+cattle_slurry,lipid,3.25,,,% TS,D2,Results text (citing Biernacki et al. 2013),liquid cattle manure
+cattle_slurry,carbohydrate,64.8,,,% TS,D2,Results text (citing Biernacki et al. 2013),liquid cattle manure
+cattle_slurry,protein_alt,16.9,,,% TS,D2,Results text (citing Luebken et al. 2007),manure; used for range
+cattle_slurry,lipid_alt,5.3,,,% TS,D2,Results text (citing Luebken et al. 2007),manure; used for range
+cattle_slurry,carbohydrate_alt,57.7,,,% TS,D2,Results text (citing Luebken et al. 2007),manure; used for range
+maize_silage,TS,33,28,35,% FM,D1,Table 4.3 p.77,
+maize_silage,VS,95,85,98,% TS,D1,Table 4.3 p.77,
+maize_silage,N_total,2.8,2.3,3.3,% TS,D1,Table 4.3 p.77,
+maize_silage,CH4_yield_FM,106,89,120,Nm3 CH4/t FM,D1,Table 4.4 p.77,
+maize_silage,BMP_VS,340,234,364,Nm3 CH4/t VS,D1,Table 4.4 p.77,
+maize_silage,f_pr,0.11,,,kg COD/kg COD Xc,D2,Table 4 (Biernacki et al. 2013),
+maize_silage,f_li,0.055,,,kg COD/kg COD Xc,D2,Table 4 (Biernacki et al. 2013),
+maize_silage,f_ch,0.695,,,kg COD/kg COD Xc,D2,Table 4 (Biernacki et al. 2013),
+maize_silage,f_xi,0.14,,,kg COD/kg COD Xc,D2,Table 4 (Biernacki et al. 2013),
+maize_silage,protein,10.3,,,% TS,D2,Results text (citing Biernacki et al. 2013),
+maize_silage,lipid,5.1,,,% TS,D2,Results text (citing Biernacki et al. 2013),
+maize_silage,carbohydrate,77.9,,,% TS,D2,Results text (citing Biernacki et al. 2013),
+grass_silage,TS,35,25,50,% FM,D1,Table 4.3 p.77,proxy for CIVE silage
+grass_silage,VS,90,70,95,% TS,D1,Table 4.3 p.77,
+grass_silage,N_total,4.0,3.5,6.9,% TS,D1,Table 4.3 p.77,
+grass_silage,CH4_yield_FM,98,93,109,Nm3 CH4/t FM,D1,Table 4.4 p.77,
+grass_silage,BMP_VS,310,300,338,Nm3 CH4/t VS,D1,Table 4.4 p.77,
+grass_silage,f_pr,0.187,,,kg COD/kg COD Xc,D2,Table 4 (Koch et al. 2010),
+grass_silage,f_li,0.033,,,kg COD/kg COD Xc,D2,Table 4 (Koch et al. 2010),
+grass_silage,f_ch,0.401,,,kg COD/kg COD Xc,D2,Table 4 (Koch et al. 2010),
+grass_silage,f_xi,0.379,,,kg COD/kg COD Xc,D2,Table 4 (Koch et al. 2010),
+grass_silage,f_pr_alt,0.21,,,kg COD/kg COD Xc,D2,Table 4 (Biernacki et al. 2013),
+grass_silage,f_li_alt,0.04,,,kg COD/kg COD Xc,D2,Table 4 (Biernacki et al. 2013),
+grass_silage,f_ch_alt,0.54,,,kg COD/kg COD Xc,D2,Table 4 (Biernacki et al. 2013),
+grass_silage,f_xi_alt,0.21,,,kg COD/kg COD Xc,D2,Table 4 (Biernacki et al. 2013),
+grass_silage,protein,17.1,,,% TS,D2,Results text (citing Koch et al. 2009),
+grass_silage,lipid,3.0,,,% TS,D2,Results text (citing Koch et al. 2009),
+grass_silage,carbohydrate,71.1,,,% TS,D2,Results text (citing Koch et al. 2009),
+all,ThOD_protein,1.42,,,kg O2/kg,D2,Table 2 (Koch et al. 2010),C5H7O2N
+all,ThOD_lipid,2.90,,,kg O2/kg,D2,Table 2 (Koch et al. 2010),C57H104O6
+all,ThOD_carbohydrate,1.19,,,kg O2/kg,D2,Table 2 (Koch et al. 2010),(C6H10O5)n
+all,ThOD_lignin,1.56,,,kg O2/kg,D2,Table 2 (Koch et al. 2010),C10.92H14.24O5.76
+mix_klimiuk,TS,113.5,,,g/kg,D2,Feedstock section,maize silage:cattle manure 49:51 % VS diluted
+mix_klimiuk,VS,93.5,,,g/kg,D2,Feedstock section,
+mix_klimiuk,f_pr,0.111,,,kg COD/kg COD Xc,D2,Table 4 / eq. 8,measured
+mix_klimiuk,f_li,0.048,,,kg COD/kg COD Xc,D2,Table 4 / eq. 9,measured
+mix_klimiuk,f_ch,0.500,,,kg COD/kg COD Xc,D2,Table 4 / eq. 10,measured
+mix_klimiuk,f_xi,0.341,,,kg COD/kg COD Xc,D2,Table 4 / eq. 11,measured
+mix_klimiuk,protein,8.18,,,% TS,D2,Table 3,
+mix_klimiuk,lipid,1.72,,,% TS,D2,Table 3,
+mix_klimiuk,starch,21.98,,,% TS,D2,Table 3,
+mix_klimiuk,cellulose,36.57,,,% TS,D2,Table 3,
+mix_klimiuk,hemicellulose,9.9,,,% TS,D2,Table 3,
+mix_klimiuk,lignin,4.05,,,% TS,D2,Table 3,
+mix_klimiuk,COD_protein,13.11,,,kg COD/m3,D2,Table 3,
+mix_klimiuk,COD_lipid,5.64,,,kg COD/m3,D2,Table 3,
+mix_klimiuk,COD_starch,29.61,,,kg COD/m3,D2,Table 3,
+mix_klimiuk,COD_cellulose,49.26,,,kg COD/m3,D2,Table 3,
+mix_klimiuk,COD_hemicellulose,13.34,,,kg COD/m3,D2,Table 3,
+mix_klimiuk,COD_lignin,7.15,,,kg COD/m3,D2,Table 3,

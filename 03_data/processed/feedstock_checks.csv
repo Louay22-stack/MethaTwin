@@ -1,0 +1,19 @@
+check,description,value,reference,pass,note
+C1,cattle_slurry: highest published BMP <= theoretical max (Nm3/t VS),275.0,454.3,True,D at top of range = 0.61
+C1,cive_silage: highest published BMP <= theoretical max (Nm3/t VS),338.0,451.6,True,D at top of range = 0.75
+C1,maize_silage: highest published BMP <= theoretical max (Nm3/t VS),364.0,458.4,True,D at top of range = 0.79
+C2,maize: f_xi from BMP vs Biernacki 2013 fractionation,0.258,0.14,True,tolerance +/-0.15 (different samples and methods)
+C2,CIVE/grass: f_xi from BMP within published range (Biernacki 2013 - Koch 2010),0.313,0.21-0.379,True,
+C3,Klimiuk Tab.3 protein COD (kg COD/m3),13.18,13.11,True,error +0.56 %
+C3,Klimiuk Tab.3 lipid COD (kg COD/m3),5.66,5.64,True,error +0.38 %
+C3,Klimiuk Tab.3 starch COD (kg COD/m3),29.69,29.61,True,error +0.26 %
+C3,Klimiuk Tab.3 cellulose COD (kg COD/m3),49.39,49.26,True,error +0.27 %
+C3,Klimiuk Tab.3 hemicellulose COD (kg COD/m3),13.37,13.34,True,error +0.24 %
+C3,Klimiuk Tab.3 lignin COD (kg COD/m3),7.17,7.15,True,error +0.29 %
+C4,"49:51 maize:manure mix, fraction X_I (predicted vs measured)",0.4,0.341,True,tolerance +/-0.1
+C4,"49:51 maize:manure mix, fraction X_pr (predicted vs measured)",0.154,0.111,True,tolerance +/-0.05
+C4,"49:51 maize:manure mix, fraction X_li (predicted vs measured)",0.105,0.048,False,tolerance +/-0.05
+C4,"49:51 maize:manure mix, fraction X_ch (predicted vs measured)",0.341,0.5,False,tolerance +/-0.1
+C5,cattle_slurry: organic N + NH4-N vs total N (kg N/t FM),4.76,3.5,False,closure +36 % (diagnostic)
+C5,cive_silage: organic N + NH4-N vs total N (kg N/t FM),9.58,14.0,False,closure -32 % (diagnostic)
+C5,maize_silage: organic N + NH4-N vs total N (kg N/t FM),5.44,9.24,False,closure -41 % (diagnostic)

@@ -81,3 +81,58 @@
   - DWSIM has an Absorption Column (usable for water scrubbing) but no membrane unit; a membrane option would need a Python unit model, as planned.
   - A single compression stage to 10 bar gives 274 °C, which is too hot. The real upgrading design will use two-stage compression with intercooling.
 - Outputs: `04_models_and_simulations/step2_smoke_test/results.json` and `smoke_test.dwxmz`, a flowsheet that can be opened in the DWSIM GUI.
+
+## 2026-11-21: Phase 3, step 3 (feedstock data and ADM1 inputs)
+
+### Data and code
+
+- **Feed mix**, typical of a French agricultural plant:
+  - cattle slurry;
+  - CIVE (intermediate energy-crop) silage, represented by grass-silage data;
+  - maize silage, capped at 15 % of gross tonnage by décret 2016-929 (CIVE are exempt from the cap).
+- **Data:** FNR *Guide to Biogas* (2010, Tables 4.1–4.4) for TS, VS, BMP and N; Klimiuk et al. (2015, open access) for composition, COD factors and a measured ADM1 influent.
+  - Every value is recorded in `03_data/raw/feedstock_literature.csv` with its table reference.
+  - The origin of every file is listed in `03_data/DATA_ORIGIN.md`.
+- **Method:** BMP-based fractionation (Koch et al. 2010).
+  - Composition gives ThOD_VS; maximum BMP = 0.350 Nm³/kg COD × ThOD_VS.
+  - Degradability D = measured BMP / maximum BMP.
+  - Proteins and lipids are taken as fully degradable; inerts = 1 − D.
+- **Code:** a reusable module, `05_code/methatwin/feedstock.py`, and the step script `05_code/step3_feedstock.py`.
+
+### Results
+
+| Feed | D | Inert fraction f_xi |
+|---|---|---|
+| Slurry | 0.46 | 0.54 |
+| CIVE | 0.69 | 0.31 |
+| Maize | 0.74 | 0.26 |
+
+Slurry NH4-N = 0.178 kmol N/m³ (assumption: midpoint of the 1–4 % TS range).
+
+### Checks
+
+**Passed:**
+- **C1, physical bound:** the highest published BMP is below the theoretical maximum for every feed.
+- **C2, independent fractionation:** maize f_xi is 0.26 vs 0.14 in Biernacki (2013), inside the ±0.15 tolerance. CIVE f_xi of 0.31 is inside the published range of 0.21–0.38.
+- **C3, code verification:** the code reproduces Klimiuk's Table 3 COD values within 0.6 % for all six components.
+
+**C4 (predicting the measured 49:51 maize:manure mix) is mixed:**
+- X_I is 0.40 vs 0.34 measured (passes) and X_pr is 0.15 vs 0.11 (passes).
+- **X_li fails:** 0.105 vs 0.048. **X_ch fails:** 0.34 vs 0.50.
+- Root cause: the lipid contents in the literature compositions (maize 5.1 % TS, manure 3.25 % TS) are 2–3 times Klimiuk's measured 1.72 % TS. Lipids carry 2.9 kg COD/kg, so this moves COD from carbohydrates to lipids.
+- Decision: tolerances not loosened; the failure is documented. Lipid content becomes an uncertain parameter (range 1.7–5.1 % TS) to be propagated later. This matters for ADM1 because lipids produce LCFA, which can inhibit the process.
+
+**C5, nitrogen diagnostic: all three feeds fail.**
+- Organic N (from crude protein) plus NH4-N does not match FNR total N. The gap is +36 % for slurry, −32 % for CIVE and −41 % for maize.
+- Cause: protein and total N come from different sources and samples.
+- Consequence: ammonia levels in the digester are uncertain. N content will be treated as an uncertain parameter, and the ADM1 nitrogen balance will be checked against it.
+
+### Base-case feed plan
+
+This first estimate uses batch BMPs; ADM1 will give continuous-reactor yields later.
+
+- Blend by fresh mass: 60 % slurry, 25 % CIVE, 15 % maize (the maize cap is respected).
+- 50.5 Nm³ CH4 per t fresh matter.
+- Feed needed for 200 Nm³/h of biomethane: **about 32,300 t/yr (88 t/day)**.
+- Methane share by substrate: slurry 20 %, CIVE 48 %, maize 32 %.
+- **Sensitivity:** using the slurry BMP of 175 instead of 210 raises the slurry f_xi from 0.54 to 0.61.

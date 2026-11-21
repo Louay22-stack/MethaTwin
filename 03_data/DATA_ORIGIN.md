@@ -1,0 +1,40 @@
+# Data origin
+
+Every data file in `03_data/` is listed here with its source. No data from unpublished work is used.
+
+## Sources
+
+| ID | Reference | Access | How values were read |
+|---|---|---|---|
+| D1 | FNR (Fachagentur Nachwachsende Rohstoffe) (2010). *Guide to Biogas – From production to use*, 5th revised edition. Tables 4.1–4.4, pp. 75–77. | Free PDF: https://energypedia.info/images/4/46/Guide_to_Biogas-_From_Production_to_Use.pdf | The PDF was opened and the table values extracted with a document-reading tool on 2026-11-21. Internal consistency was checked (see below). |
+| D2 | Klimiuk E., Gusiatin Z.M., Bułkowska K., Pokój T., Rynkowska S. (2015). ADM1-based modeling of anaerobic codigestion of maize silage and cattle manure – a feedstock characterisation for model implementation (part I). *Archives of Environmental Protection* 41(3). | Open access: https://www.journals.pan.pl/Content/86065/PDF/10265-Volume41-Issue3_paper_02.pdf | The full text was read on 2026-11-21. Tables 2, 3 and 4, plus values the authors quote from Biernacki et al. (2013), Koch et al. (2009, 2010) and Lübken et al. (2007). |
+| R1 | Décret n° 2016-929 du 7 juillet 2016 (amended by décret 2022-1120). Main food or energy crops are limited to 15 % of the gross input tonnage of a methanisation plant; CIVE and crop residues are not counted. | https://aida.ineris.fr/reglementation/decret-ndeg-2016-929-070716-pris-lapplication-larticle-541-39-code-lenvironnement | Read from INERIS AIDA and parliamentary answers, via search. The current consolidated text should be confirmed on Légifrance. |
+
+## Files
+
+| File | Content | Origin |
+|---|---|---|
+| `raw/feedstock_literature.csv` | One row per literature value, with its range, unit, source ID and location in the source | D1, D2 |
+| `processed/feedstock_adm1.csv` | ADM1 characterisation of each feed: COD per t of fresh matter and COD fractions | Computed by `05_code/step3_feedstock.py` from the raw file |
+| `processed/feedstock_checks.csv` | Validation checks: predicted vs measured methane potential, and reproduction of the Klimiuk tables | Same script |
+| `processed/base_case_feed_plan.json` | Base-case feed blend, annual tonnage and methane share by substrate | Same script |
+
+## Assumptions (each one is tested in the uncertainty analysis)
+
+1. **CIVE are represented by grass-silage data.** French winter CIVE are mostly cereals, ryegrass and legumes harvested green and ensiled, which is close to grass silage.
+   - Why: no open data source with ADM1-ready composition for CIVE was found. The Solagro/FranceAgriMer 2024 CIVE guide gives methane potentials but not composition.
+2. **Ammonium in cattle slurry is 2.5 % of TS**, the midpoint of the 1–4 % range in D1 (D1 gives no average).
+3. **Methane per COD is 0.350 Nm³ CH4/kg COD.** This follows from stoichiometry: 1 mol CH4 needs 64 g O2 and occupies 22.414 L at 0 °C and 1 atm. This is physics, not a fitted value.
+4. **Slurry and silage densities are taken as 1 t/m³.** Klimiuk et al. use the same value for their diluted feed.
+
+## Internal consistency check of D1
+
+The methane yield per tonne of fresh matter divided by the volatile solids per tonne gives the methane yield per tonne of VS. Compared with the per-VS value D1 states:
+
+| Feed | Calculated from D1 averages | Stated in D1 | Agreement |
+|---|---|---|---|
+| Maize silage | 106 / (0.33 × 0.95) = 338 Nm³/t VS | 340 | Consistent |
+| Grass silage | 98 / (0.35 × 0.90) = 311 Nm³/t VS | 310 | Consistent |
+| Cattle slurry | 14 / (0.10 × 0.80) = 175 Nm³/t VS | 210 | Not consistent (−17 %) |
+
+The cattle slurry averages are not mutually consistent in the source, so both figures are kept as the uncertainty range.
