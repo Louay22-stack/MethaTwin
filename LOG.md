@@ -199,3 +199,86 @@ Klimiuk/Bułkowska lab digester: 100 L, 39 °C, HRT 45 d, measured influent from
 **Conclusion:** the model is verified (benchmark and balances) and is consistent with measured data, except for acetate. The base design cannot reach the target in a single CSTR. Feed rate, HRT and a post-digester are the levers for the optimisation step.
 
 - Figure: `06_figures/fig04_adm1_validation_and_base_case.png`.
+
+## 2026-11-21: Phase 3, step 5 (biogas upgrading in DWSIM: high-pressure water scrubbing)
+
+### Specification and thermodynamics
+
+**Grid specification** (GRDF, ENTSOG gas-quality workshop, 19 Nov 2025):
+
+| Parameter | Limit |
+|---|---|
+| CO2 | < 2.5 % (exemption up to 3.5 %) |
+| HHV | 10.7–12.8 kWh/Nm³ |
+| Wobbe index | 13.64–15.70 kWh/Nm³ |
+| O2 | < 100 ppm (exemption up to 0.75 %) |
+| Water dew point | < −5 °C |
+
+**Thermodynamics check** (`05_code/step5a_thermo_check.py`):
+
+- Henry's-law references:
+  - CO2: 0.034 M/atm, 2400 K (Sander 2023, via Wikipedia)
+  - O2: 1.3e-3 M/atm, 1700 K (same source)
+  - N2: 6.1e-4 M/atm, 1300 K (same source)
+  - CH4: 0.0014 mol/(kg·bar), 1700 K (NIST WebBook)
+- **No default DWSIM package was usable:**
+  - Peng-Robinson: CH4 −100 %. The kij(CH4, water) of 0.5 is a placeholder that blocks dissolution. CO2 was −15 to −39 %.
+  - SRK and PRSV2: −85 to −100 % for both gases.
+  - NRTL: CH4 correct (Henry's law applies above the critical temperature), but CO2 +2,100 %, because CO2 is below its critical temperature and is treated as condensable.
+- **Fix:** Peng-Robinson kij(gas, water) fitted to Henry's law at 12.5 °C:
+  - CO2 −0.147, CH4 −0.347, O2 −0.334, N2 −0.695.
+  - Saved in `04_models_and_simulations/step5_upgrading/fitted_kij.json` and applied by `methatwin/dwsim_thermo.py`.
+- **DWSIM quirk:** kij values are cached at the first flash, so they must be set right after the package is created.
+- **Limitation:** a constant kij cannot follow the temperature dependence (−19 % at 5 °C, +59 % at 25 °C). The validity window is therefore 10–15 °C, where every gas is within 15 % and the CO2/CH4 selectivity is 23–26 against 26–27 in the literature. All water-contacting units run at 10.0–10.3 °C, which the code checks.
+
+### Flowsheet
+
+`methatwin/upgrading.py` builds the whole flowsheet in DWSIM from Python:
+
+1. Gas train: chiller and knock-out drum, two-stage intercooled compression to 9 bar, aftercooler.
+2. T-201: absorber (equilibrium stages).
+3. F-201: flash at the intermediate pressure. Its gas is recycled between the two compressor stages.
+4. F-202: CO2 flash at 1.05 bar, which gives a biogenic CO2 stream.
+5. T-301: air stripper.
+6. Water loop: pump and chiller back to the absorber.
+
+The two recycle streams are closed in Python by successive substitution, with 0.5 damping on the gas recycle.
+
+### Problems and fixes
+
+| # | Symptom | Cause | Fix |
+|---|---|---|---|
+| 1 | Absorber did nothing, though the balances closed | **Unit bug:** water flow missing ×1000 (m³ → kg → g). Caught by inspecting stream flows. **Lesson: closed balances do not prove intent.** | Conversion corrected |
+| 2 | "Not converged" above 55 m³/h of water at 3.5 bar | **Physics:** the rich water is under-saturated at the flash pressure, so F-201 releases no gas and dissolved CH4 is lost (slip 7–10 %). The convergence test divided by the recycle flow, which was ~0. | Tolerances normalised by plant inflows; flash pressure added to the design variables |
+| 3 | Absorber returned zero top gas for some designs, with no DWSIM error | DWSIM column solver returned a non-physical result. CH4 solubility makes it impossible. | Sanity check added; such runs are flagged as solver failures and excluded |
+| 4 | Division by zero | Zero recycle flow in the damped update | Guarded |
+
+### Design sweep
+
+Water 40–70 m³/h × 6 or 10 stages × flash pressure 2.0, 2.5 or 3.5 bar: 36 runs. 28 converged, 3 were solver failures and 5 did not converge in 120 iterations; the last two groups were excluded.
+
+- Stripping air is not limiting: 8 vs 15 Nm³/m³ changed product CO2 by less than 0.01 points.
+- **Selection criterion:** lowest energy penalty (electricity plus the lower heating value of slipped CH4, 9.97 kWh/Nm³) among designs that meet the CO2, HHV and Wobbe specifications.
+
+### Selected design: 45 m³/h water, 10 equilibrium stages, 3.5 bar flash, 8 Nm³ air per m³ water
+
+| Result | Value | Spec or literature |
+|---|---|---|
+| Biomethane | 197.4 Nm³/h (dry) at 99.03 % CH4 | — |
+| CO2 | **0.46 %** | < 2.5 % ✅ |
+| HHV | 10.95 kWh/Nm³ | 10.7–12.8 ✅ |
+| Wobbe index | 14.63 kWh/Nm³ | 13.64–15.70 ✅ |
+| O2 | **1,927 ppm** | < 100 ppm ❌; < 0.75 % exemption ✅ |
+| CH4 slip | 0.43 % (recovery 99.57 %) | about 1 % for water scrubbing (Persson 2013) |
+| Electricity | 60.7 kW = **0.176 kWh/Nm³ raw gas** | 0.20–0.30 (Persson 2013); our scope excludes the dryer and H2S removal |
+| Biogenic CO2 | 99 Nm³/h at 99.2 % (dry), ~1,600 t/yr | 65 % of the raw CO2 |
+
+**Balances:** mass 0.001 %; components ≤ 0.004 %; energy residual −1.75 kW, which is 1.5 % of work plus heat. The energy residual is attributed to the make-up-water enthalpy approximation and the residual of the tear loop.
+
+**O2:** comes from the stripping air dissolving in the recycled water and being released in the absorber. This is a known issue for water scrubbers; GRTgaz and GRDF have published a guide on controlling O2. Mitigation options for the optimisation step: regeneration without air (vacuum flash) or a lower air ratio combined with a deoxygenation step.
+
+**Outputs:**
+- `design_sweep.csv`, `final_design.json`, and `hpws_final.dwxmz` (opens in the DWSIM GUI)
+- Figure: `06_figures/fig05_upgrading_hpws.png`
+
+**Out of scope, as assumptions:** H2S removal (assumed upstream biological desulfurisation plus activated carbon), drying to the −5 °C dew point (TSA or PSA), and compressor and blower motor efficiencies (shaft power is reported). The chiller COP of 3 is an assumption.

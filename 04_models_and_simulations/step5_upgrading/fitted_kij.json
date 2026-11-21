@@ -1,0 +1,16 @@
+{
+  "kij": {
+    "CO2": -0.14662078967176934,
+    "CH4": -0.34749139068834817,
+    "O2": -0.3336554035185334,
+    "N2": -0.6948823563221295
+  },
+  "T_fit_K": 285.65,
+  "validity_window_C": [
+    10.0,
+    15.0
+  ],
+  "P_bar": 9.0,
+  "package": "Peng-Robinson (PR)",
+  "note": "gas-water kij fitted to Henry's law, see methatwin/dwsim_thermo.py for references"
+}
