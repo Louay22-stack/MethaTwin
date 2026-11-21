@@ -520,3 +520,19 @@ Differential evolution on the surrogates, with LCOE as the objective, followed b
 - **Limitation:** the design space has no ammonia-mitigation lever (dilution, NH3 stripping, low-N feeds). These are listed as future work.
 
 Figure: `06_figures/fig07_tea_optimisation.png`.
+
+## 2026-11-21: Phase 4 (final report)
+
+- The user approved Phase 4 directly.
+- `05_code/phase4_report_pdf.py` builds `07_report/MethaTwin_Final_Report.pdf` (19 pages, reportlab, DejaVu fonts from matplotlib for full Unicode).
+  - Sections: title page, executive summary, contents, introduction and market context, objectives with an honest status per objective, methodology, results, discussion, limitations, conclusions and future work, references, appendices (validation checklist, assumptions, code structure and reproduction, project selection and data policy).
+  - Result tables (surrogate metrics, optima, tornado, Monte Carlo, robust design, BSM2 summary) are read from the saved outputs in `04_models_and_simulations`, so the report cannot drift from the results.
+- **Objective status, stated in the report:**
+  - O1 met; O3 met (2,300× in batch, but only 36× for a single point; LCOE computed from surrogate outputs, not learned directly); O5 met (IRR not computed).
+  - O2 partly met: the scrubber energy residual is 1.5 %, above the 1 % objective.
+  - O4 partly met: single-objective optimisation at four fixed capacities instead of a Pareto front; temperature fixed at 39 °C.
+  - O6 partly met: the interactive dashboard was not built and a clean-machine re-run has not been tested.
+- **Citation check while writing:** the Koch et al. (2010) and Biernacki et al. (2013) values were read in Klimiuk et al. [L11], not in the original papers, so the report cites them "via [L11]". The 0.350 Nm³ CH4/kg COD factor is cited as stoichiometry, not attributed to a paper. Two sentences were softened because no source supported them (water scrubbing as "the most common" technology; the cause of the unstable Monte Carlo samples).
+- **Noted while checking the results:** the 300 Nm³/h optimum sits at the upper feed bound (160 t/d) and its simulated VFA (6.4 g/L) slightly exceeds the 6.0 g/L margin applied to the surrogate. Stated in the report.
+- Layout was checked by rendering every page to images (PyMuPDF, already installed). `pypdfium2` was also installed for this before PyMuPDF was found; neither is needed to build the report.
+- README rewritten: key results, code map, full run order, requirements and limitations.
