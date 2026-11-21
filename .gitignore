@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+~$*
+
+# Large or regenerable simulation output (keep small, documented files only)
+03_data/raw/**/*.parquet
+04_models_and_simulations/**/runs/
+*.log
