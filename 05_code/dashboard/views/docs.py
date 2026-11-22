@@ -31,7 +31,7 @@ with c1:
         "6. **Save scenarios** and compare them on *Designs & scenarios*; export tables as CSV.")
 with c2:
     with st.container(border=True):
-        st.image(str(T.ASSETS / "logo.svg"), width="stretch")
+        st.image(str(T.ASSETS / "logo_dark.svg"), width="stretch")
         ui.md('<dl class="mt-kv"><dt>Author</dt><dd>Louay Ouhibi, Industrial Biology Engineer (INSAT, Tunisia)</dd>'
               '<dt>Engine</dt><dd>ML surrogates of ADM1 + DWSIM, CRE-anchored TEA</dd>'
               '<dt>Stack</dt><dd>Python, SciPy, scikit-learn, XGBoost, DWSIM, pythonnet, Streamlit, Plotly</dd>'

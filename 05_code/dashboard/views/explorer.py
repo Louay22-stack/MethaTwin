@@ -47,7 +47,7 @@ def decorate(f: go.Figure) -> go.Figure:
             j = i
             while j + 1 < len(xs) and unstable[j + 1]:
                 j += 1
-            f.add_vrect(x0=xs[max(i - 1, 0)], x1=xs[j], fillcolor="#9AA6A3", opacity=0.16, line_width=0)
+            f.add_vrect(x0=xs[max(i - 1, 0)], x1=xs[j], fillcolor="#1B2436", opacity=0.75, line_width=0)
             i = j + 1
         else:
             i += 1
@@ -63,7 +63,7 @@ def line(col: str, title: str, color: str, ref: tuple | None = None, logy: bool 
     f = go.Figure(go.Scatter(x=xs, y=A[col] * scale, mode="lines", line=dict(color=color, width=2.4), name=title,
                              hovertemplate="%{y:.3g}<extra></extra>"))
     f.add_scatter(x=[cur], y=[np.interp(cur, xs, A[col] * scale)], mode="markers", hoverinfo="skip",
-                  marker=dict(color=T.CORAL, size=10, line=dict(color="#fff", width=2)))
+                  marker=dict(color=T.CORAL, size=10, line=dict(color=T.SURFACE, width=2)))
     if ref:
         f.add_hline(y=ref[0], line=dict(color=ref[2], width=1.2, dash="dash"), annotation_text=ref[1],
                     annotation_position="top left", annotation_font=dict(size=10, family="IBM Plex Mono", color=ref[2]))
@@ -139,15 +139,15 @@ def response_map() -> None:
                                     labelfont=dict(size=10, color=T.BLUE, family="IBM Plex Mono")),
                       line=dict(color=T.BLUE, width=1.1))
         f.add_scatter(x=[X[xa] * kx], y=[X[ya] * ky], mode="markers", name="current design", hoverinfo="skip",
-                      marker=dict(size=13, color=T.CORAL, symbol="diamond", line=dict(color="#fff", width=2)))
-        f.update_layout(height=470, plot_bgcolor="#E4E9E5", showlegend=False, margin=dict(t=12, b=8, l=6, r=6),
+                      marker=dict(size=13, color=T.CORAL, symbol="diamond", line=dict(color=T.SURFACE, width=2)))
+        f.update_layout(height=470, plot_bgcolor="#151E30", showlegend=False, margin=dict(t=12, b=8, l=6, r=6),
                         xaxis_title=f"{core.LABELS[xa]} ({core.UNITS[xa]})", yaxis_title=f"{core.LABELS[ya]} ({core.UNITS[ya]})")
         st.plotly_chart(f, width="stretch", config=T.PLOT_CFG)
-        direction = "darker = higher" + (" (better)" if rev else " (worse)" if met != "p_stable" else "")
+        direction = "brighter = higher" + (" (better)" if rev else " (worse)" if met != "p_stable" else "")
         ui.md(f'<div class="mt-legend"><span><i style="background:{T.CORAL};height:8px;width:8px"></i>Current design</span>'
               f'<span><i style="background:{T.BLUE}"></i>Output contours 150 / 200 / 250 / 300 Nm³/h</span>'
-              + ('<span><i style="background:#0B2622"></i>LCOE = tariff</span>' if met == "LCOE_EUR_MWh" else "")
-              + f'<span><i style="background:#C9D1CC;height:8px"></i>Grey = unstable or off-spec</span><span>Colour: {direction}</span></div>')
+              + ('<span><i style="background:#E8EEF8"></i>LCOE = tariff</span>' if met == "LCOE_EUR_MWh" else "")
+              + f'<span><i style="background:#151E30;height:8px;border:1px solid #2A3A58"></i>Dark = unstable or off-spec</span><span>Colour: {direction}</span></div>')
 
 
 response_map()

@@ -602,3 +602,24 @@ Figure: `06_figures/fig07_tea_optimisation.png`.
 The server log shows no errors.
 
 **Note.** Scenarios live in the browser session; reloading the URL starts a new session.
+
+## 2026-11-22: Visual identity v3 "Bioluminescent lab"
+
+**Brief.** The user asked for a cutting-edge AI-biotech startup look: eye-catching, smooth, with a striking palette. Structure, features and the science are unchanged.
+
+**Direction.**
+- Dark ink surfaces (#070B14 page, #0E1525 panels). Light comes from a mint → cyan → violet spectrum (#5EF2C8 → #56CCF2 → #A78BFA), read as "living cells → computation". It is used only for the brand, the active state and primary actions.
+- Faint fixed light fields in the background. A floating glass app bar with a spectrum hairline. A pill navigation rail with a glowing active state.
+- Gradient numbered section tags, KPI tiles with a coloured top light and hover lift, glowing gauges, gradient primary buttons.
+- Pulsing status dot, flowing process lines, subtle entry animation. All motion is off under prefers-reduced-motion.
+- Streamlit theme switched to the dark base, so sliders, tables, dialogs and selects match.
+
+**Data colours re-validated for dark mode** (surface #0E1525), using the colour-vision validator:
+- Teal #14AA82, blue #3D8BF0, coral #E5663A and violet #9175F5. Lightness band, chroma floor, CVD (dE 19.8), normal-vision floor and 3:1 contrast all pass.
+- The first candidates (#34D3A6 …, then #1FBF91 …) failed the dark lightness band and were darkened.
+
+**Other changes.**
+- Heatmap ramp runs from navy to mint; the legend now reads "brighter = higher".
+- New logo variants for dark surfaces: `logo_mark_dark.svg` (mint mark, cyan-violet digital half, coral nodes) and `logo_dark.svg`. The light logo is kept for the README.
+
+**Tested.** The cockpit, explorer, map and design register were checked at 1440×900, and the cockpit at 375×812 with no horizontal overflow. The server log shows no errors. `core.py` and `methatwin/` are unchanged.

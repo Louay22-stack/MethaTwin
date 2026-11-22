@@ -43,7 +43,8 @@ def kpis(items: list[dict]) -> None:
     cells = ""
     for k in items:
         sw = f'<i style="background:{k["color"]}"></i>' if k.get("color") else ""
-        cells += (f'<div class="mt-kpi" title="{html.escape(k.get("tip", ""))}"><div class="l">{sw}{k["label"]}</div>'
+        cc = f' style="--c:{k["color"]}"' if k.get("color") else ""
+        cells += (f'<div class="mt-kpi"{cc} title="{html.escape(k.get("tip", ""))}"><div class="l">{sw}{k["label"]}</div>'
                   f'<div class="v">{k["value"]}<small>{k.get("unit", "")}</small></div>'
                   f'<div class="d {k.get("cls", "")}">{k.get("delta", "&nbsp;")}</div></div>')
     md(f'<div class="mt-kpis" style="--n:{len(items)}">{cells}</div>')
@@ -79,7 +80,7 @@ def callout(text: str, kind: str = "") -> None:
 def pfd(x: dict, r: dict, status: dict) -> None:
     """Live process flow diagram of the plant with stream values from the current evaluation.
     status: {'digester': ok|warn|bad, 'upgrading': ..., 'grid': ...}"""
-    col = {"ok": T.GOOD, "warn": "#D99A21", "bad": T.BAD}
+    col = {"ok": T.GOOD, "warn": T.WARN, "bad": T.BAD}
     feed = x["feed_t_d"]
     shares = [("Cattle slurry", 1 - x["maize_share"] - x["cive_share"], T.VIOLET),
               ("CIVE silage", x["cive_share"], T.TEAL), ("Maize silage", x["maize_share"], T.CORAL)]
@@ -105,7 +106,7 @@ def pfd(x: dict, r: dict, status: dict) -> None:
 
     # --- feed
     s.append(f'<g class="unit"><title>Feedstock blend: {feed:.0f} t/day fresh matter. Maize is capped at 15 % by décret 2016-929.</title>')
-    s.append(f'<rect class="box" x="20" y="70" width="200" height="170" fill="#fff" stroke="{T.LINE}" rx="3"/>')
+    s.append(f'<rect class="box" x="20" y="70" width="200" height="170" fill="{T.SURFACE_2}" stroke="{T.LINE}" rx="10"/>')
     s.append(tag(34, 92, "FEED · FS-100"))
     s.append(t(34, 116, f"{feed:.0f}", 22, T.INK, 600, head) + t(34 + 14 * len(f"{feed:.0f}"), 116, " t/day", 11, T.MUTED, 500, mono))
     yy = 140
@@ -122,7 +123,7 @@ def pfd(x: dict, r: dict, status: dict) -> None:
     k = status["digester"]
     s.append(f'<g class="unit"><title>R-101 mesophilic CSTR digester (ADM1 surrogate). Volume {x["feed_t_d"] * x["hrt_d"]:,.0f} m³, '
              f'HRT {x["hrt_d"]:.0f} d, 39 °C. Stable if pH ≥ 6.8 and VFA ≤ 8 g COD/L.</title>')
-    s.append(f'<path class="box" d="M290 110 Q 390 52 490 110 L490 262 L290 262 Z" fill="#fff" stroke="{col[k]}" stroke-width="1.6"/>')
+    s.append(f'<path class="box" d="M290 110 Q 390 52 490 110 L490 262 L290 262 Z" fill="{T.SURFACE_2}" stroke="{col[k]}" stroke-width="1.6"/>')
     s.append(f'<path d="M290 236 L490 236 L490 262 L290 262 Z" fill="{T.MINT_SOFT}"/>')
     s.append(tag(304, 128, "R-101 · DIGESTER"))
     s.append(dot(472, 124, k))
@@ -147,7 +148,7 @@ def pfd(x: dict, r: dict, status: dict) -> None:
 
     # --- compression
     s.append(f'<g class="unit"><title>K-101/K-102 two-stage intercooled compression to 9 bar. Scrubber electricity {r["P_el_upg_kW"]:.0f} kW.</title>')
-    s.append(f'<circle class="box" cx="626" cy="150" r="26" fill="#fff" stroke="{T.LINE}" stroke-width="1.4"/>')
+    s.append(f'<circle class="box" cx="626" cy="150" r="26" fill="{T.SURFACE_2}" stroke="{T.LINE}" stroke-width="1.4"/>')
     s.append(f'<path d="M608 136 L646 142 L646 158 L608 164 Z" fill="none" stroke="{T.INK_2}" stroke-width="1.4"/>')
     s.append(tag(600, 196, "K-101/102"))
     s.append(t(626, 112, f'⚡ {r["P_el_upg_kW"]:.0f} kW', 10.5, T.INK, 600, mono, "middle"))
@@ -158,7 +159,7 @@ def pfd(x: dict, r: dict, status: dict) -> None:
     k = status["upgrading"]
     s.append(f'<g class="unit"><title>T-201 high-pressure water scrubber (DWSIM surrogate), 10 equilibrium stages at 9 bar, '
              f'flash F-201 at {x["p_flash_bar"]:.2f} bar recycled to compression. Methane slip {r["CH4_slip_pct"]:.2f} %.</title>')
-    s.append(f'<rect class="box" x="712" y="56" width="74" height="228" rx="30" fill="#fff" stroke="{col[k]}" stroke-width="1.6"/>')
+    s.append(f'<rect class="box" x="712" y="56" width="74" height="228" rx="30" fill="{T.SURFACE_2}" stroke="{col[k]}" stroke-width="1.6"/>')
     for i in range(9):
         yv = 86 + i * 20
         s.append(f'<line x1="720" y1="{yv}" x2="778" y2="{yv}" stroke="{T.LINE}" stroke-width="1" stroke-dasharray="3 3"/>')
@@ -180,8 +181,8 @@ def pfd(x: dict, r: dict, status: dict) -> None:
     s.append(tag(800, 26, "BIOMETHANE · 9 BAR"))
     s.append(f'<g class="unit"><title>Grid injection (GRDF specification): CO₂ &lt; 2.5 %, HHV 10.7–12.8 kWh/Nm³, '
              f'O₂ &lt; 100 ppm (exemption up to 0.75 %). Net flow after 3.5 % heat self-use.</title>')
-    s.append(f'<rect class="box" x="870" y="66" width="310" height="136" fill="#fff" stroke="{col[k]}" stroke-width="1.6" rx="3"/>')
-    s.append(f'<rect x="870" y="66" width="310" height="26" fill="{T.PETROL_900}" rx="3"/><rect x="870" y="80" width="310" height="12" fill="{T.PETROL_900}"/>')
+    s.append(f'<rect class="box" x="870" y="66" width="310" height="136" fill="{T.SURFACE_2}" stroke="{col[k]}" stroke-width="1.6" rx="10"/>')
+    s.append(f'<rect x="870" y="66" width="310" height="26" fill="{T.SURFACE_3}" rx="10"/><rect x="870" y="80" width="310" height="12" fill="{T.SURFACE_3}"/>')
     s.append(t(884, 83, "GRID INJECTION · GRDF", 9.5, T.MINT, 600, mono, ls=0.9))
     s.append(dot(1162, 79, k))
     s.append(t(884, 126, f'{r["bm_net_Nm3_h"]:.0f}', 30, T.INK, 600, head) + t(884 + 18 * len(f'{r["bm_net_Nm3_h"]:.0f}') + 4, 126, "Nm³/h net", 11, T.MUTED, 500, mono))
@@ -191,7 +192,7 @@ def pfd(x: dict, r: dict, status: dict) -> None:
     xx = 884
     for a, b, ok in q:
         s.append(t(xx, 172, a, 9.5, T.MUTED, 500, mono, ls=0.6))
-        s.append(t(xx, 189, b, 11, T.GOOD if ok else "#A86400", 600, mono))
+        s.append(t(xx, 189, b, 11, T.GOOD if ok else T.WARN, 600, mono))
         xx += 100
     s.append("</g>")
 
@@ -199,13 +200,13 @@ def pfd(x: dict, r: dict, status: dict) -> None:
     s.append(f'<line class="flow" x1="786" y1="270" x2="934" y2="270" stroke="{T.CORAL}" stroke-width="2" marker-end="url(#ar)"/>')
     s.append(f'<g class="unit"><title>Off-gas from the flash and stripper. Value is a balance on the surrogate outputs (raw CO₂ minus CO₂ in product); '
              f'in the full design a 1.05 bar flash recovers ~65 % of it as a 99 % biogenic CO₂ stream.</title>')
-    s.append(f'<rect class="box" x="940" y="240" width="240" height="64" fill="#fff" stroke="{T.LINE}" rx="3"/>')
+    s.append(f'<rect class="box" x="940" y="240" width="240" height="64" fill="{T.SURFACE_2}" stroke="{T.LINE}" rx="10"/>')
     s.append(tag(954, 260, "CO₂ OFF-GAS / CAPTURE"))
     s.append(t(954, 287, f'≈ {co2_removed:.0f} Nm³/h CO₂ removed', 11.5, T.INK, 600, mono))
     s.append("</g>")
     s.append("</svg>")
     md(f'<div class="mt-pfd">{"".join(s)}</div>')
-    md('<div class="mt-legend"><span><i style="background:#0E8A6E"></i>Gas</span><span><i style="background:#2F6FDB"></i>Process water</span>'
-       '<span><i style="background:#E2683F"></i>CO₂ off-gas</span><span>● Unit status: '
-       f'<b style="color:{T.GOOD}">ok</b> / <b style="color:#A86400">margin</b> / <b style="color:{T.BAD}">violated</b></span>'
+    md(f'<div class="mt-legend"><span><i style="background:{T.TEAL}"></i>Gas</span><span><i style="background:{T.BLUE}"></i>Process water</span>'
+       f'<span><i style="background:{T.CORAL}"></i>CO₂ off-gas</span><span>● Unit status: '
+       f'<b style="color:{T.GOOD}">ok</b> / <b style="color:{T.WARN}">margin</b> / <b style="color:{T.BAD}">violated</b></span>'
        '<span>Hover a unit for details</span></div>')

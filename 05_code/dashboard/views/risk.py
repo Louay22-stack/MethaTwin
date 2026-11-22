@@ -82,9 +82,9 @@ ui.kpis([
 ui.section("01", "Distributions", "stable samples only · hover bars for counts")
 v1, v2 = st.columns(2, gap="medium")
 with v1, st.container(border=True):
-    f = go.Figure(go.Histogram(x=L, nbinsx=55, marker=dict(color=T.TEAL, line=dict(color="#fff", width=1)),
+    f = go.Figure(go.Histogram(x=L, nbinsx=55, marker=dict(color=T.TEAL, line=dict(color=T.SURFACE, width=1)),
                                hovertemplate="%{x} €/MWh<br>%{y} samples<extra></extra>"))
-    f.add_vrect(x0=111, x1=169, fillcolor=T.MINT_SOFT, opacity=0.55, line_width=0, layer="below")
+    f.add_vrect(x0=111, x1=169, fillcolor="rgba(94,242,200,0.07)", line_width=0, layer="below")
     for qq, lab in ((0.1, "P10"), (0.5, "P50"), (0.9, "P90")):
         f.add_vline(x=q[qq], line=dict(color=T.INK, width=1.4 if qq == 0.5 else 1, dash="solid" if qq == 0.5 else "dot"))
         f.add_annotation(x=q[qq], y=1, yref="paper", yanchor="bottom", showarrow=False, text=f"{lab} {q[qq]:.0f}",
@@ -95,9 +95,9 @@ with v1, st.container(border=True):
 with v2, st.container(border=True):
     npv = mc.NPV_EUR[stab] / 1e6
     f = go.Figure()
-    f.add_histogram(x=npv[npv < 0], nbinsx=40, marker=dict(color=T.CORAL, line=dict(color="#fff", width=1)), name="loss",
+    f.add_histogram(x=npv[npv < 0], nbinsx=40, marker=dict(color=T.CORAL, line=dict(color=T.SURFACE, width=1)), name="loss",
                     hovertemplate="%{x} M€<br>%{y} samples<extra>loss</extra>")
-    f.add_histogram(x=npv[npv >= 0], nbinsx=20, marker=dict(color=T.TEAL, line=dict(color="#fff", width=1)), name="profit",
+    f.add_histogram(x=npv[npv >= 0], nbinsx=20, marker=dict(color=T.TEAL, line=dict(color=T.SURFACE, width=1)), name="profit",
                     hovertemplate="%{x} M€<br>%{y} samples<extra>profit</extra>")
     f.add_vline(x=0, line=dict(color=T.INK, width=1.4))
     f.update_layout(title="Net present value, 15 years (M€)", height=320, bargap=0.03, barmode="overlay",
@@ -136,12 +136,12 @@ e1.download_button("Download samples (CSV)", mc.to_csv(index=False).encode(), fi
 with e2, st.container(border=True):
     sub = mc.sample(min(len(mc), 2500), random_state=1)
     f = go.Figure(go.Scattergl(x=sub[xin], y=sub.LCOE_EUR_MWh, mode="markers",
-                               marker=dict(size=5, color=np.where(sub.p_stable >= 0.5, T.TEAL, "#B9C3BF"), opacity=0.65),
+                               marker=dict(size=5, color=np.where(sub.p_stable >= 0.5, T.TEAL, "#3A475E"), opacity=0.65),
                                hovertemplate=f"{INPUTS[xin]} %{{x:.3g}}<br>LCOE %{{y:.1f}} €/MWh<extra></extra>"))
     f.add_hline(y=lc0, line=dict(color=T.INK, width=1, dash="dot"))
     if xin in ("K_I_nh3", "k_dis"):
         f.update_xaxes(type="log")
     f.update_layout(height=330, xaxis_title=INPUTS[xin], yaxis_title="LCOE (€/MWh)", margin=dict(t=14))
     st.plotly_chart(f, width="stretch", config=T.PLOT_CFG)
-    ui.md('<div class="mt-legend"><span><i style="background:#0E8A6E;height:8px;width:8px"></i>stable sample</span>'
-          '<span><i style="background:#B9C3BF;height:8px;width:8px"></i>predicted unstable</span><span>dotted = nominal LCOE</span></div>')
+    ui.md('<div class="mt-legend"><span><i style="background:#14AA82;height:8px;width:8px"></i>stable sample</span>'
+          '<span><i style="background:#3A475E;height:8px;width:8px"></i>predicted unstable</span><span>dotted = nominal LCOE</span></div>')

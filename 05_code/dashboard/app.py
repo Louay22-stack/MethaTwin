@@ -23,7 +23,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import theme as T  # noqa: E402
 
-st.set_page_config(page_title="MethaTwin · Biomethane digital twin", page_icon=str(T.ASSETS / "logo_mark.svg"),
+st.set_page_config(page_title="MethaTwin · Biomethane digital twin", page_icon=str(T.ASSETS / "logo_mark_dark.svg"),
                    layout="wide", initial_sidebar_state="auto")
 st.markdown(T.CSS, unsafe_allow_html=True)
 
@@ -33,7 +33,7 @@ import ui  # noqa: E402
 try:
     S.sur()
 except FileNotFoundError as e:                       # error state: models missing
-    ui.md(f'<div class="mt-appbar"><div class="mt-brand"><img src="{T.svg_data_uri("logo_mark.svg")}"/>'
+    ui.md(f'<div class="mt-appbar"><div class="mt-brand"><img src="{T.svg_data_uri("logo_mark_dark.svg")}"/>'
           f'<span class="nm">Metha<span>Twin</span></span></div></div>')
     st.error("**The trained ML surrogates were not found.**\n\n" + str(e))
     st.code("python 05_code/step6b_surrogate.py", language="powershell")
@@ -137,7 +137,7 @@ valid = R["p_upg_valid"] >= 0.5
 dot, txt = ("", "Design feasible") if (stable and spec and valid) else \
            ("warn", "Low simulator reliability") if (stable and spec) else ("bad", "Constraint violated")
 ref = S.matches_reference()
-ui.md(f'<div class="mt-appbar"><div class="mt-brand"><img src="{T.svg_data_uri("logo_mark.svg")}"/>'
+ui.md(f'<div class="mt-appbar"><div class="mt-brand"><img src="{T.svg_data_uri("logo_mark_dark.svg")}"/>'
       f'<span class="nm">Metha<span>Twin</span></span><span class="ver">v2.0</span></div>'
       f'<div class="mt-appbar-right"><span class="mt-status"><span class="mt-dot {dot}"></span><span class="txt">{txt}</span></span>'
       f'<span class="mt-status"><span class="txt">Design · {"reference" if ref else "custom"}</span></span>'

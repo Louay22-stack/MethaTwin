@@ -131,19 +131,19 @@ with c3, st.container(border=True):
     ui.panel_head("Cost build-up per MWh", f"LCOE {R['LCOE_EUR_MWh']:.1f} €/MWh")
     f = go.Figure()
     for name, v, c in parts:
-        f.add_bar(y=[""], x=[v], name=name, orientation="h", marker=dict(color=c, line=dict(color="#fff", width=2)),
+        f.add_bar(y=[""], x=[v], name=name, orientation="h", marker=dict(color=c, line=dict(color=T.SURFACE, width=2)),
                   text=[f"{v:.0f}"], textposition="inside", insidetextanchor="middle", textangle=0,
-                  textfont=dict(color="#fff", size=12, family="IBM Plex Mono"),
+                  textfont=dict(color="#FFFFFF", size=12, family="IBM Plex Mono"),
                   hovertemplate=f"<b>{name}</b><br>%{{x:.1f}} €/MWh · {100 * v / R['LCOE_EUR_MWh']:.0f} % of LCOE<extra></extra>")
     f.add_vline(x=s.tariff, line=dict(color=T.INK, width=1.6, dash="dash"))
     f.add_annotation(x=s.tariff, y=1, yref="paper", yanchor="bottom", showarrow=False, text=f"tariff {s.tariff:.0f}",
                      font=dict(size=10.5, family="IBM Plex Mono", color=T.INK))
-    f.add_vrect(x0=core.CRE["q1"], x1=core.CRE["q3"], fillcolor=T.MINT_SOFT, opacity=0.6, line_width=0, layer="below")
+    f.add_vrect(x0=core.CRE["q1"], x1=core.CRE["q3"], fillcolor="rgba(94,242,200,0.08)", line_width=0, layer="below")
     f.add_annotation(x=core.CRE["q1"], y=0, yref="paper", yanchor="top", xanchor="left", showarrow=False,
                      text="French plants, CRE interquartile range", font=dict(size=10, color=T.MUTED))
     f.update_layout(barmode="stack", height=190, uniformtext=dict(minsize=9, mode="hide"), margin=dict(t=24, b=46, l=4, r=10),
                     xaxis=dict(title="€/MWh", range=[0, max(s.tariff, R["LCOE_EUR_MWh"], core.CRE["q3"]) * 1.06]),
-                    legend=dict(orientation="h", y=-0.62, yanchor="top"))
+                    legend=dict(orientation="h", y=-0.62, yanchor="top", traceorder="normal"))
     st.plotly_chart(f, width="stretch", config=T.PLOT_CFG)
 with c4, st.container(border=True):
     ui.panel_head("Investment breakdown", f"total {R['capex_total'] / 1e6:.2f} M€")

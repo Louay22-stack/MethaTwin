@@ -74,21 +74,21 @@ with tab_v:
     opt = df[df.Design.str.startswith("Verified")]
     with c1, st.container(border=True):
         f = go.Figure()
-        f.add_hrect(y0=core.CRE["q1"], y1=core.CRE["q3"], fillcolor=T.MINT_SOFT, opacity=0.7, line_width=0, layer="below")
-        f.add_hline(y=core.CRE["median"], line=dict(color=T.PETROL_600, width=1.1, dash="dot"), annotation_text="CRE median 129.6",
+        f.add_hrect(y0=core.CRE["q1"], y1=core.CRE["q3"], fillcolor="rgba(94,242,200,0.08)", line_width=0, layer="below")
+        f.add_hline(y=core.CRE["median"], line=dict(color=T.MINT, width=1.1, dash="dot"), annotation_text="CRE median 129.6",
                     annotation_position="bottom right", annotation_font=dict(size=10, family="IBM Plex Mono"))
         f.add_hline(y=152.8, line=dict(color=T.INK, width=1.4, dash="dash"), annotation_text="average tariff 152.8",
                     annotation_position="top right", annotation_font=dict(size=10, family="IBM Plex Mono"))
         f.add_scatter(x=opt["Output (Nm³/h)"], y=opt["LCOE (€/MWh)"], mode="lines+markers+text",
                       text=[f"{v:.0f}" for v in opt["LCOE (€/MWh)"]], textposition="top center",
                       textfont=dict(family="IBM Plex Mono", size=11), line=dict(color=T.CORAL, width=2.4),
-                      marker=dict(size=10, color=T.CORAL, line=dict(color="#fff", width=2)),
+                      marker=dict(size=10, color=T.CORAL, line=dict(color=T.SURFACE, width=2)),
                       customdata=opt["NPV (M€)"], hovertemplate="%{x:.0f} Nm³/h<br>LCOE %{y:.1f} €/MWh<br>NPV %{customdata:+.2f} M€<extra></extra>")
         f.update_layout(title="Economies of scale · break-even ≈ 180 Nm³/h", height=340, showlegend=False,
                         xaxis_title="Biomethane injected (Nm³/h)", yaxis_title="LCOE (€/MWh)", yaxis_range=[105, 165])
         st.plotly_chart(f, width="stretch", config=T.PLOT_CFG)
     with c2, st.container(border=True):
-        items = [("Naive scale-up", nv["simulation"], "#9DB7E8"), ("Nominal optimum", RES["unc"]["comparison_200"]["optimum"]["simulation"], T.BLUE),
+        items = [("Naive scale-up", nv["simulation"], T.BLUE_SOFT), ("Nominal optimum", RES["unc"]["comparison_200"]["optimum"]["simulation"], T.BLUE),
                  ("Robust (K_I ≥ 0.0016)", rb["final"]["simulation"], T.TEAL)]
         f = go.Figure(go.Bar(x=[i[0] for i in items], y=[i[1]["LCOE_EUR_MWh"] for i in items], marker_color=[i[2] for i in items],
                              text=[f"{i[1]['LCOE_EUR_MWh']:.1f}" for i in items], textposition="outside", cliponaxis=False,

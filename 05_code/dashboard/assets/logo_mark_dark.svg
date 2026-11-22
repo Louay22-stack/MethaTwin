@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="MethaTwin mark">
+  <defs>
+    <linearGradient id="mtd-a" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5EF2C8"/><stop offset="1" stop-color="#14AA82"/>
+    </linearGradient>
+    <linearGradient id="mtd-b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#56CCF2"/><stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 4 C26 14 13 25 13 39 C13 50.5 21.5 59 32 59 Z" fill="url(#mtd-a)"/>
+  <path d="M32 52 C27 46 24.5 40 25 32" fill="none" stroke="#04121A" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 4 C38 14 51 25 51 39 C51 50.5 42.5 59 32 59" fill="none" stroke="url(#mtd-b)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M32 24 H39 L43 28" fill="none" stroke="url(#mtd-b)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 36 H45" fill="none" stroke="url(#mtd-b)" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M32 48 H38 L41 45" fill="none" stroke="url(#mtd-b)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="43.6" cy="28.6" r="2.6" fill="#FF9A6B"/>
+  <circle cx="45.6" cy="36" r="2.6" fill="#FF9A6B"/>
+  <circle cx="41.6" cy="44.4" r="2.6" fill="#FF9A6B"/>
+</svg>
