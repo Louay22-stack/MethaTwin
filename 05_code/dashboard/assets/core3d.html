@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--card:%%CARD%%;--raised:%%RAISED%%;--line:%%LINE%%;--control:%%CONTROL%%;--ink:%%INK%%;--ink2:%%INK2%%;--muted:%%MUTED%%;--accent:%%ACCENT%%;--on:%%ON%%}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:transparent;color:var(--ink);font:500 15px/1.5 Manrope,system-ui,sans-serif;overflow:hidden}
+#wrap{position:relative;height:100%;display:flex;flex-direction:column;background:transparent}
+#stage{position:relative;flex:1;min-height:0;cursor:grab;touch-action:pan-y;outline:none;border-radius:18px}
+#stage:active{cursor:grabbing}
+#stage:focus-visible{box-shadow:inset 0 0 0 3px var(--accent)}
+canvas{display:block;width:100%;height:100%}
+#poster{display:none;position:absolute;inset:0;align-items:center;justify-content:center}
+#poster svg{width:min(80%,420px);height:auto}
+.hint{position:absolute;left:16px;top:14px;font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;pointer-events:none}
+.hint i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.side{position:absolute;right:16px;font:700 12px Manrope;letter-spacing:.14em;text-transform:uppercase;pointer-events:none;display:flex;align-items:center;gap:8px}
+.side::before{content:"";width:18px;height:1px;background:currentColor;opacity:.6}
+#lblReal{top:24%;color:var(--ink2)}#lblTwin{top:70%;color:var(--accent)}
+#bar{padding:14px 16px 16px;margin:28px 2px 2px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb, var(--card) 88%, transparent);
+  backdrop-filter:blur(6px);display:grid;grid-template-columns:1fr;gap:12px;align-items:center}
+#caption{min-height:46px}
+#caption b{font:600 16px Sora,Manrope,sans-serif;letter-spacing:-.01em;color:var(--ink);display:block}
+#caption span{color:var(--ink2);font-size:14px}
+.hot{display:flex;gap:8px;flex-wrap:wrap}
+.hot button{font:700 14px Manrope,sans-serif;color:var(--ink);background:var(--raised);border:1px solid var(--control);border-radius:999px;
+  min-height:44px;padding:0 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .2s,border-color .2s}
+.hot button svg{width:18px;height:18px}
+.hot button:hover{border-color:var(--accent)}
+.hot button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (max-width:620px){.side{right:10px;font-size:11px}#lblReal{top:20%}#lblTwin{top:72%}.hot button{padding:0 12px}}
+@media (prefers-reduced-motion: reduce){.hot button{transition:none}}
+</style></head><body>
+<div id="wrap">
+  <div id="stage" tabindex="0" role="img" aria-label="3D view: the real biomethane tank stands on a dark glossy floor; its reflection below is its digital twin, drawn in amber lines and particles. Use the left and right arrow keys to turn it.">
+    <div class="hint"><i></i>Drag to turn</div>
+    <div class="side" id="lblReal">Real plant</div><div class="side" id="lblTwin">Its twin</div>
+    <div id="poster" aria-hidden="true">%%POSTER%%</div>
+  </div>
+  <div id="bar">
+    <div id="caption" aria-live="polite"></div>
+    <div class="hot" role="group" aria-label="What the twin answers">
+      <button data-k="bio" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V11a8 6 0 0 1 16 0v9z"/><path d="M4 16h16"/><circle cx="12" cy="4" r="1.5"/></svg>Biology</button>
+      <button data-k="gas" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="4"/><path d="M10 8h4M10 12h4M10 16h4"/></svg>Gas</button>
+      <button data-k="money" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M14.5 9a3 3 0 1 0 0 6M8 11h5M8 13.5h5"/></svg>Money</button>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const C = {ink:"%%INK%%", ink2:"%%INK2%%", accent:"%%ACCENT%%", metal:"%%METAL%%", rose:"%%ROSE%%", floor:"%%SUNKEN%%"};
+const CAP = {
+  none:["The real plant, and its twin in the mirror.","On the glass stands the plant; beneath it, the twin that copies it. Pick a question to see what the twin watches."],
+  bio:["Are the microbes healthy?","Inside the warm tank, microbes turn slurry and silage into biogas. The twin follows them and warns before the tank turns sour."],
+  gas:["Is the gas good enough for the grid?","The raw gas is washed with water under pressure: CO₂ is stripped away and almost pure methane flows on. The twin checks it against the network rules."],
+  money:["Does the plant pay?","Every MWh of gas sold earns money back; building and running the plant costs it. The twin adds both up over fifteen years."]};
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const stage = document.getElementById("stage"), cap = document.getElementById("caption");
+let focus = "none", kick = () => {};
+function setCaption(k){ cap.innerHTML = "<b>"+CAP[k][0]+"</b><span>"+CAP[k][1]+"</span>"; }
+setCaption("none");
+document.querySelectorAll(".hot button").forEach(b => b.addEventListener("click", () => {
+  const k = b.dataset.k; focus = (focus === k) ? "none" : k;
+  document.querySelectorAll(".hot button").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.k === focus)));
+  setCaption(focus); kick();
+}));
+function poster(){ document.getElementById("poster").style.display = "flex"; }
+
+let renderer;
+try { if (!window.THREE) throw new Error("three.js not loaded");
+  renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, powerPreference:"low-power"});
+} catch(e) { poster(); return; }
+try { build(); } catch (err) { console.error("MethaTwin 3D scene could not start:", err); renderer.domElement.remove(); poster(); }
+
+function build(){
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.setClearColor(0x000000, 0);
+stage.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+scene.add(new THREE.HemisphereLight(0xF3EFE6, 0x0B0B0A, 0.55));
+const key = new THREE.DirectionalLight(0xFFE2B0, 1.2); key.position.set(4, 7, 6); scene.add(key);
+const rim = new THREE.DirectionalLight(0x74B9FF, 0.35); rim.position.set(-6, 2, -5); scene.add(rim);
+const AMBER = new THREE.Color(C.accent);
+
+// ---------------------------------------------------------------- layout of the plant (real space, y >= 0)
+const R = 1.55, H = 1.9, DOME = 0.45, TOP = H + R * DOME;
+const COL = new THREE.Vector3(2.55, 0, -0.55), COLH = 2.5, COLR = 0.28;   // gas-cleaning column
+const GRID = new THREE.Vector3(3.55, 0, 0.75);                           // grid connection
+const pipeA = new THREE.CatmullRomCurve3([new THREE.Vector3(0, TOP - 0.02, 0), new THREE.Vector3(0, TOP + 0.45, 0),
+  new THREE.Vector3(0.8, TOP + 0.6, -0.25), new THREE.Vector3(COL.x, TOP + 0.6, COL.z), new THREE.Vector3(COL.x, COLH + 0.15, COL.z)]);
+const pipeB = new THREE.CatmullRomCurve3([new THREE.Vector3(COL.x + 0.05, 0.55, COL.z + 0.25), new THREE.Vector3(3.0, 0.55, 0.1),
+  new THREE.Vector3(GRID.x, 0.55, GRID.z - 0.2), new THREE.Vector3(GRID.x, 0.35, GRID.z)]);
+
+const world = new THREE.Group(); scene.add(world);
+const real = new THREE.Group(); world.add(real);
+const twin = new THREE.Group(); world.add(twin);
+
+// ---------------------------------------------------------------- the real plant: brushed graphite metal
+const metal = new THREE.MeshStandardMaterial({color:C.metal, metalness:.6, roughness:.38, emissive:AMBER.clone(), emissiveIntensity:0});
+const tank = new THREE.Mesh(new THREE.CylinderGeometry(R, R, H, 72, 1, true), metal); tank.position.y = H / 2; real.add(tank);
+const dome = new THREE.Mesh(new THREE.SphereGeometry(R, 72, 20, 0, Math.PI * 2, 0, Math.PI / 2), metal); dome.scale.y = DOME; dome.position.y = H; real.add(dome);
+const band = new THREE.Mesh(new THREE.TorusGeometry(R + 0.012, 0.018, 8, 96), new THREE.MeshBasicMaterial({color:C.accent, transparent:true, opacity:.7}));
+band.rotation.x = Math.PI / 2; band.position.y = H * 0.78; real.add(band);
+const colMesh = new THREE.Mesh(new THREE.CylinderGeometry(COLR, COLR, COLH, 32), metal); colMesh.position.set(COL.x, COLH / 2, COL.z); real.add(colMesh);
+const colCap = new THREE.Mesh(new THREE.SphereGeometry(COLR, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2), metal); colCap.position.set(COL.x, COLH, COL.z); real.add(colCap);
+const pipeMat = new THREE.MeshStandardMaterial({color:"#8E877A", metalness:.7, roughness:.35});
+real.add(new THREE.Mesh(new THREE.TubeGeometry(pipeA, 80, 0.05, 10, false), pipeMat));
+real.add(new THREE.Mesh(new THREE.TubeGeometry(pipeB, 60, 0.045, 10, false), pipeMat));
+const valve = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.36, 24), metal); valve.position.set(GRID.x, 0.18, GRID.z); real.add(valve);
+
+// ---------------------------------------------------------------- the twin: mirrored below the floor, amber lines fading with depth
+const DEPTH = 3.1;
+function fadeLines(geo, matrix, strength){
+  const g = new THREE.WireframeGeometry(geo); g.applyMatrix4(matrix); g.applyMatrix4(new THREE.Matrix4().makeScale(1, -1, 1));
+  const p = g.attributes.position, col = new Float32Array(p.count * 3);
+  for (let i = 0; i < p.count; i++) { const f = Math.pow(Math.max(0, 1 + p.getY(i) / DEPTH), 1.4) * strength;
+    col[i*3] = AMBER.r * f; col[i*3+1] = AMBER.g * f; col[i*3+2] = AMBER.b * f; }
+  g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+  const m = new THREE.LineSegments(g, new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity:1, blending:THREE.AdditiveBlending, depthWrite:false}));
+  twin.add(m); return m;
+}
+const M = (x, y, z, sy = 1) => new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion(), new THREE.Vector3(1, sy, 1));
+const tTank = fadeLines(new THREE.CylinderGeometry(R, R, H, 28, 5, true), M(0, H / 2, 0), 0.9);
+const tDome = fadeLines(new THREE.SphereGeometry(R, 28, 6, 0, Math.PI * 2, 0, Math.PI / 2), M(0, H, 0, DOME), 0.9);
+const tCol = fadeLines(new THREE.CylinderGeometry(COLR, COLR, COLH, 10, 8, true), M(COL.x, COLH / 2, COL.z), 1.0);
+const tPipeA = fadeLines(new THREE.TubeGeometry(pipeA, 40, 0.05, 4, false), new THREE.Matrix4(), 1.0);
+const tPipeB = fadeLines(new THREE.TubeGeometry(pipeB, 30, 0.045, 4, false), new THREE.Matrix4(), 1.0);
+const tValve = fadeLines(new THREE.CylinderGeometry(0.2, 0.2, 0.36, 10, 1), M(GRID.x, 0.18, GRID.z), 1.0);
+const mirrorY = v => new THREE.Vector3(v.x, -v.y, v.z);
+const tPathA = new THREE.CatmullRomCurve3(pipeA.points.map(mirrorY));
+const tPathB = new THREE.CatmullRomCurve3(pipeB.points.map(mirrorY));
+
+// ---------------------------------------------------------------- the floor: dark gloss that fades out at the edges
+function radialTex(stops){ const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d");
+  const gr = g.createRadialGradient(128, 128, 0, 128, 128, 128); stops.forEach(s => gr.addColorStop(s[0], s[1])); g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  return new THREE.CanvasTexture(c); }
+// the mirror: a thin dark glass disc with a glowing amber rim; the plant stands on it, the twin hangs just beneath
+const DR = 4.4, GAP = 0.22;
+twin.position.y = -GAP;
+const glass = new THREE.Mesh(new THREE.CylinderGeometry(DR, DR, 0.1, 128, 1), new THREE.MeshStandardMaterial({color:C.floor, metalness:.35, roughness:.18,
+  transparent:true, opacity:.5, depthWrite:false}));
+glass.position.y = -0.05; glass.renderOrder = 2; world.add(glass);
+const rimTop = new THREE.Mesh(new THREE.TorusGeometry(DR, 0.016, 8, 160), new THREE.MeshBasicMaterial({color:C.accent, transparent:true, opacity:.9}));
+rimTop.rotation.x = Math.PI / 2; world.add(rimTop);
+const rimLow = new THREE.Mesh(new THREE.TorusGeometry(DR, 0.012, 8, 160), new THREE.MeshBasicMaterial({color:C.accent, transparent:true, opacity:.35}));
+rimLow.rotation.x = Math.PI / 2; rimLow.position.y = -0.1; world.add(rimLow);
+const sheen = new THREE.Mesh(new THREE.CircleGeometry(DR, 96), new THREE.MeshBasicMaterial({map: radialTex([[0, "rgba(255,226,176,.30)"], [0.45, "rgba(255,178,36,.08)"], [1, "rgba(0,0,0,0)"]]),
+  transparent:true, depthWrite:false, blending:THREE.AdditiveBlending}));
+sheen.rotation.x = -Math.PI / 2; sheen.position.y = 0.002; sheen.renderOrder = 3; world.add(sheen);
+// faint rings so the glass reads as a surface
+[2.3, 3.1, 3.8].forEach((r, i) => { const m = new THREE.Mesh(new THREE.RingGeometry(r, r + 0.012, 128), new THREE.MeshBasicMaterial({color:C.ink2,
+  transparent:true, opacity:0.22 - i * 0.05, side:THREE.DoubleSide, depthWrite:false})); m.rotation.x = -Math.PI / 2; m.position.y = 0.003; m.renderOrder = 4; world.add(m); });
+const contact = new THREE.Mesh(new THREE.RingGeometry(R, R + 0.03, 96), new THREE.MeshBasicMaterial({color:C.accent, transparent:true, opacity:.8, side:THREE.DoubleSide}));
+contact.rotation.x = -Math.PI / 2; contact.position.y = 0.004; world.add(contact);
+const ripples = [0, 1, 2].map(i => { const m = new THREE.Mesh(new THREE.RingGeometry(1, 1.012, 128), new THREE.MeshBasicMaterial({color:C.accent, transparent:true,
+  opacity:0, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false})); m.rotation.x = -Math.PI / 2; m.position.y = 0.006; m.userData.t = i / 3; world.add(m); return m; });
+
+// ---------------------------------------------------------------- twin particles (additive points with per-point size and alpha)
+function pointsMat(){ return new THREE.ShaderMaterial({transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, uniforms:{uScale:{value:300}, uLevel:{value:1}},
+  vertexShader:"attribute float size; attribute float alpha; attribute vec3 tint; varying vec3 vC; varying float vA; uniform float uScale;"+
+    "void main(){ vC=tint; vA=alpha; vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=size*uScale/-mv.z; gl_Position=projectionMatrix*mv; }",
+  fragmentShader:"varying vec3 vC; varying float vA; uniform float uLevel; void main(){ float d=length(gl_PointCoord-0.5); float a=smoothstep(.5,.1,d);"+
+    " if(a<0.01) discard; gl_FragColor=vec4(vC, a*vA*uLevel); }"}); }
+function makePoints(n){ const g = new THREE.BufferGeometry();
+  ["position", "tint"].forEach(k => g.setAttribute(k, new THREE.BufferAttribute(new Float32Array(n * 3), 3)));
+  ["size", "alpha"].forEach(k => g.setAttribute(k, new THREE.BufferAttribute(new Float32Array(n), 1)));
+  const p = new THREE.Points(g, pointsMat()); p.frustumCulled = false; p.renderOrder = 5; twin.add(p); return p; }  // drawn after the glass so they glow through it
+const depthFade = y => Math.pow(Math.max(0, 1 + y / DEPTH), 1.2);
+// microbes swirling inside the twin tank
+const NB = 520, bio = makePoints(NB), B = [];
+for (let i = 0; i < NB; i++) B.push({a: Math.random() * 6.283, r: Math.sqrt(Math.random()) * (R - 0.15), y: 0.1 + Math.random() * (H - 0.2), s: 0.6 + Math.random() * 0.8, ph: Math.random() * 6.283});
+// gas bubbles along the twin pipes, and CO2 peeling off at the column
+const NG = 46, gas = makePoints(NG), G = []; for (let i = 0; i < NG; i++) G.push({t: i / NG, path: i % 3 ? 0 : 1});
+const NC = 60, co2 = makePoints(NC), CO = [];
+for (let i = 0; i < NC; i++) CO.push({age: (i / NC) * 3, p0: new THREE.Vector3(), v: new THREE.Vector3()});
+function respawn(c){ const a = Math.random() * 6.283;
+  c.p0.set(COL.x, -(0.3 + Math.random() * (COLH - 0.5)), COL.z); c.v.set(Math.cos(a) * 0.35, -0.08 - Math.random() * 0.1, Math.sin(a) * 0.35); }
+CO.forEach(respawn);
+const cRose = new THREE.Color(C.rose), cGas = new THREE.Color("#FFD98A");
+// coins stacking under the twin grid connection
+const coins = []; const coinGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.08, 28, 1);
+for (let i = 0; i < 7; i++) {
+  const m = new THREE.LineSegments(new THREE.WireframeGeometry(coinGeo), new THREE.LineBasicMaterial({color:C.accent, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false}));
+  m.position.set(GRID.x + 0.3, -0.12 - i * 0.11, GRID.z + 0.5); m.renderOrder = 5; m.userData.on = 0; m.userData.since = 0; twin.add(m); coins.push(m); }
+let moneySince = 0;
+
+// ---------------------------------------------------------------- interaction: horizontal drag turns the plant; vertical gestures scroll the page
+let yaw = -0.5, yawT = -0.5, dragging = false, lastX = 0, lastInput = -1e9;
+stage.addEventListener("pointerdown", e => { dragging = true; lastX = e.clientX; stage.setPointerCapture(e.pointerId); lastInput = performance.now(); kick(); });
+stage.addEventListener("pointermove", e => { if (!dragging) return; yawT += (e.clientX - lastX) * 0.008; lastX = e.clientX; lastInput = performance.now(); kick(); });
+["pointerup", "pointercancel"].forEach(ev => stage.addEventListener(ev, () => dragging = false));
+stage.addEventListener("keydown", e => { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { yawT += (e.key === "ArrowLeft" ? -0.25 : 0.25);
+  lastInput = performance.now(); e.preventDefault(); kick(); } });
+
+function resize(){ const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / Math.max(h, 1);
+  const narrow = w < 520; camera.position.set(0.6, narrow ? 3.8 : 3.3, narrow ? 18.5 : 14.2); camera.lookAt(0.9, 0.35, 0);
+  camera.updateProjectionMatrix(); [bio, gas, co2].forEach(p => p.material.uniforms.uScale.value = h * 1.7 * renderer.getPixelRatio()); }
+new ResizeObserver(() => { resize(); kick(); }).observe(stage); resize();
+
+// highlight levels per question, eased each frame
+const BASE = .45, lvl = {bio: BASE, gas: BASE, money: BASE};
+let visible = true, running = false, last = performance.now(), t = 0, lastFocus = "none";
+new IntersectionObserver(es => { visible = es[0].isIntersecting; kick(); }).observe(stage);
+document.addEventListener("visibilitychange", kick);
+
+function step(dt){
+  const anim = !reduce;
+  const ease = k => reduce ? 1 : Math.min(1, dt * k);
+  if (focus !== lastFocus) { if (focus === "money") moneySince = t; lastFocus = focus; }
+  if (anim && !dragging && performance.now() - lastInput > 2500) yawT += dt * 0.1;
+  yaw += (yawT - yaw) * ease(6); world.rotation.y = yaw;
+  for (const k in lvl) { const target = focus === "none" ? BASE : (focus === k ? 1 : 0.18); lvl[k] += (target - lvl[k]) * ease(5); }
+  metal.emissiveIntensity = 0.1 * Math.max(0, (lvl.bio - BASE) / (1 - BASE));
+  [tTank, tDome].forEach(m => m.material.opacity = 0.35 + 0.65 * Math.max(lvl.bio, (lvl.gas + lvl.money) / 3));
+  [tCol, tPipeA, tPipeB].forEach(m => m.material.opacity = 0.3 + 0.7 * Math.max(lvl.gas, lvl.bio / 3));
+  tValve.material.opacity = 0.3 + 0.7 * Math.max(lvl.money, lvl.gas / 2);
+  // microbes
+  const bp = bio.geometry.attributes;
+  for (let i = 0; i < NB; i++) { const p = B[i];
+    if (anim) { p.a += dt * 0.25 / (0.5 + p.r); p.y = Math.min(H - 0.1, Math.max(0.1, p.y + Math.sin(t * 0.7 + p.ph) * dt * 0.06)); }
+    const y = -p.y;
+    bp.position.array[i*3] = p.r * Math.cos(p.a); bp.position.array[i*3+1] = y; bp.position.array[i*3+2] = p.r * Math.sin(p.a);
+    bp.tint.array[i*3] = AMBER.r; bp.tint.array[i*3+1] = AMBER.g; bp.tint.array[i*3+2] = AMBER.b;
+    bp.size.array[i] = 0.08 * p.s * (focus === "bio" ? 1.5 : 1);
+    bp.alpha.array[i] = depthFade(y) * (0.55 + 0.45 * Math.pow(Math.sin(t * 2 + p.ph * 3), 2)); }
+  bio.material.uniforms.uLevel.value = 0.25 + 0.95 * lvl.bio;
+  // gas bubbles along the pipes
+  const gp = gas.geometry.attributes;
+  for (let i = 0; i < NG; i++) { const g = G[i];
+    if (anim) g.t = (((g.t + dt * (g.path ? 0.16 : 0.12)) % 1) + 1) % 1;
+    const pt = (g.path ? tPathB : tPathA).getPointAt(Math.min(0.999, Math.max(0, g.t)));
+    gp.position.array[i*3] = pt.x; gp.position.array[i*3+1] = pt.y; gp.position.array[i*3+2] = pt.z;
+    gp.tint.array[i*3] = cGas.r; gp.tint.array[i*3+1] = cGas.g; gp.tint.array[i*3+2] = cGas.b;
+    gp.size.array[i] = 0.18; gp.alpha.array[i] = depthFade(pt.y) * 0.95; }
+  gas.material.uniforms.uLevel.value = 0.25 + 0.95 * lvl.gas;
+  // CO2 stripped away at the twin column, drifting outwards and fading
+  const cp = co2.geometry.attributes;
+  for (let i = 0; i < NC; i++) { const c = CO[i];
+    if (anim) { c.age += dt; if (c.age > 3) { c.age -= 3; respawn(c); } }
+    const x = c.p0.x + c.v.x * c.age, y = c.p0.y + c.v.y * c.age, z = c.p0.z + c.v.z * c.age;
+    cp.position.array[i*3] = x; cp.position.array[i*3+1] = y; cp.position.array[i*3+2] = z;
+    cp.tint.array[i*3] = cRose.r; cp.tint.array[i*3+1] = cRose.g; cp.tint.array[i*3+2] = cRose.b;
+    cp.size.array[i] = 0.12; cp.alpha.array[i] = depthFade(y) * Math.max(0, 1 - c.age / 3) * 0.9; }
+  co2.material.uniforms.uLevel.value = focus === "gas" ? 1 : 0.15 + 0.4 * lvl.gas;
+  [bp, gp, cp].forEach(a => { a.position.needsUpdate = a.tint.needsUpdate = a.size.needsUpdate = a.alpha.needsUpdate = true; });
+  // coins: two resting by default; the full stack builds up, one by one, when Money is chosen
+  coins.forEach((m, i) => {
+    const on = focus === "money" ? (reduce || t - moneySince > i * 0.18 ? 1 : 0) : (i < 2 ? 1 : 0);
+    m.userData.on += (on - m.userData.on) * ease(6);
+    m.material.opacity = m.userData.on * depthFade(m.position.y) * (0.35 + 0.65 * lvl.money);
+    if (anim) m.rotation.y += dt * 0.6; });
+  // ripples spreading from the base of the tank across the floor
+  ripples.forEach(r => { if (anim) r.userData.t = (r.userData.t + dt * 0.12) % 1; const k = r.userData.t;
+    const s = R + 0.05 + k * (DR - R - 0.2); r.scale.set(s, s, 1); r.material.opacity = reduce ? 0 : 0.28 * (1 - k) * (0.5 + lvl.bio * 0.5); });
+}
+function frame(now){
+  // rAF timestamps can be slightly older than performance.now(): clamp so time never runs backwards
+  const dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = Math.max(last, now); t += dt;
+  try { step(dt); renderer.render(scene, camera); }
+  catch (err) { console.error("MethaTwin 3D scene stopped:", err); renderer.domElement.style.display = "none"; poster(); running = false; return; }
+  const settling = Math.abs(yawT - yaw) > 1e-3;
+  if (visible && !document.hidden && (!reduce || settling)) requestAnimationFrame(frame); else running = false;
+}
+kick = function(){ if (running) return; running = true; last = performance.now(); requestAnimationFrame(frame); };
+kick();
+}
+})();
+</script>
+</body></html>

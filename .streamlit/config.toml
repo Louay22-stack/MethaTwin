@@ -1,10 +1,16 @@
+# Mirrors the semantic tokens in 05_code/dashboard/tokens.py (v4 "Signal") for Streamlit's native widgets.
 [theme]
 base = "dark"
-primaryColor = "#3DDBB0"
-backgroundColor = "#070B14"
-secondaryBackgroundColor = "#131D31"
-textColor = "#E8EEF8"
-font = "sans serif"
+primaryColor = "#FFB224"          # accent
+backgroundColor = "#121212"       # surface-canvas
+secondaryBackgroundColor = "#25231F"  # surface-raised
+textColor = "#F3EFE6"             # text-primary
+borderColor = "#3A3731"           # border-subtle
+linkColor = "#FFB224"
+font = "Manrope:https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
+headingFont = "Sora:https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&display=swap"
+baseRadius = "12px"
+showWidgetBorder = true
 
 [server]
 headless = true

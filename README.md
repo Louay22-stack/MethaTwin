@@ -1,4 +1,4 @@
-<p><img src="05_code/dashboard/assets/logo.svg" alt="MethaTwin" width="300"/></p>
+<p><img src="05_code/dashboard/assets/wordmark.svg" alt="MethaTwin" width="300"/></p>
 
 
 **MethaTwin** is a machine-learning-accelerated digital twin of an agricultural biomethane plant (~200 Nm³/h), from the digester to the gas grid. It is built from public data and open-source tools only.
@@ -13,16 +13,17 @@
 
 ## Interactive application
 
-MethaTwin ships as an interactive web application (Streamlit) that anyone can use without DWSIM. A **design console** on the left holds every input (feed blend, feed rate, retention time, scrubber settings, microbial kinetics, prices); six pages read from it. All live values come from the ML surrogates (milliseconds per design); saved designs also show their full-simulation results.
+MethaTwin ships as an interactive web application (Streamlit) that anyone can use without DWSIM. Its slogan: **See your plant work before it exists.** The app opens on a start page with a 3D "living mirror": the real plant stands on a dark glass disc and its twin is its amber reflection underneath; three questions (biology, gas, money) bring the matching part of the twin to life. Every page then opens with a plain-language verdict; figures, tables and charts open on click, and technical terms are explained on hover, focus or tap. The settings live on the Your plant page and apply to every page; all live values come from the ML surrogates (milliseconds per design), and checked designs also show their full-simulation results.
 
 | Page | What it does |
 |---|---|
-| Plant cockpit | Feasibility verdict, instrument readouts, **live process flow diagram** with stream values and unit status, constraint tables with position-vs-limit gauges, cost build-up, JSON export |
-| Design explorer | One-input sweeps (cost, output, acids, CO₂) and a two-input response map with selectable axes and metric |
-| Risk analysis | On-demand Monte Carlo (500–5,000 samples) with run / out-of-date / empty states, NPV and LCOE distributions, tornado, sample explorer, CSV export |
-| Designs & scenarios | Register of verified designs (select a row to load it), economies of scale; save, compare, reload and export your own scenarios |
-| Model validation | Filterable validation chain, sortable surrogate accuracy table (train / CV / test), lab and market checks |
-| Documentation | Workflow, methods, searchable glossary, limitations, report download |
+| Start | Slogan, brand promise, 3D living mirror (drag to turn; Biology/Gas/Money light up the twin's microbes, gas flow and coins), the three questions, ways in |
+| Your plant | Verdict and three answers (biology, gas, money) next to the settings (reference design, feed and tank, gas cleaning, microbes, market; save and reset); key figures, process diagram, operating limits, costs and JSON export open on click |
+| Try changes | The setting that matters most for cost; one-setting curves and a two-setting map on click |
+| What could go wrong | On-demand Monte Carlo: “pays in N of 10 futures”; key figures, cost range, main drivers and every future (CSV) on click |
+| Designs | Where you are; checked designs (select a row to load it) and your own saved designs (load, delete, compare, CSV) |
+| Why trust it | Score of the 16 checks; scorecard, every check, surrogate accuracy, lab and market checks, figures on click |
+| How it works | One-sentence summary, four steps, report download; methods, glossary, limits on click |
 
 ```powershell
 pip install -r requirements.txt
@@ -34,7 +35,7 @@ streamlit run 05_code/dashboard/app.py
 
 The application needs the trained models; if `04_models_and_simulations/step6_surrogate/models/surrogates.joblib` is missing, run `python 05_code/step6b_surrogate.py` first (the app shows this instruction instead of crashing).
 
-Code: `05_code/dashboard/`: `app.py` (shell: app bar, navigation, design console), `state.py` (session state, scenarios, cached evaluations), `core.py` (model layer: surrogates + TEA), `ui.py` (components and the process flow diagram), `theme.py` (design tokens, CSS, chart template), `views/` (one file per page), `assets/` (logo).
+Code: `05_code/dashboard/`: `app.py` (shell: top bar, navigation, current-design chip), `state.py` (session state, scenarios, cached evaluations), `core.py` (model layer: surrogates + TEA), `tokens.py` (design tokens: primitive → semantic → component), `theme.py` (brand marks, CSS built from the tokens, chart template), `ui.py` (components, icon set, status logic, process diagram), `views/` (one file per page), `assets/` (mark, app icon and wordmark SVGs, `core3d.html` three.js scene). The design system (MASTER.md, tokens as DTCG JSON and CSS, concept board) is in `design-system/methatwin/`.
 
 ## Key results
 
@@ -72,7 +73,7 @@ Code: `05_code/dashboard/`: `app.py` (shell: app bar, navigation, design console
 | `methatwin/surrogate.py` | Loads and runs the cascaded surrogates |
 | `methatwin/tea.py` | CAPEX, OPEX, LCOE and NPV |
 | `dwsim_bridge.py` | Loads DWSIM (.NET 10) into Python through pythonnet / CoreCLR |
-| `dashboard/` | Interactive application (shell, state, model layer, components, pages, theme, logo) |
+| `dashboard/` | Interactive application (shell, state, model layer, tokens, theme, components, pages, brand assets) |
 
 ## Reproducing the work
 

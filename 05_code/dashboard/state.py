@@ -27,7 +27,7 @@ DESIGN_KEYS = {"maize_pct": "maize_share", "cive_pct": "cive_share", "feed": "fe
 TOL = {"maize_share": 0.006, "cive_share": 0.006, "feed_t_d": 0.6, "hrt_d": 0.6, "water_per_kNm3": 0.6, "p_flash_bar": 0.03}
 
 
-@st.cache_resource(show_spinner="Loading ML surrogates (first start only)…")
+@st.cache_resource(show_spinner="Waking up the twin…")
 def sur():
     return core.load_surrogate()
 
@@ -61,9 +61,17 @@ def reset_all() -> None:
     st.session_state.update({**KIN_DEFAULTS, **ECON_DEFAULTS})
 
 
+WIDGET_KEYS = ("preset", *DESIGN_KEYS, *KIN_DEFAULTS, *ECON_DEFAULTS)
+
+
 def init() -> None:
     if "preset" not in st.session_state:
         reset_all()
+    # The inputs are drawn on one page only; Streamlit drops a widget's state when the widget is not drawn,
+    # so re-assigning the keys on every run keeps the design alive across pages.
+    for k in WIDGET_KEYS:
+        if k in st.session_state:
+            st.session_state[k] = st.session_state[k]
     st.session_state.setdefault("scenarios", {})
 
 
