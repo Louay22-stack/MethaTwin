@@ -123,7 +123,7 @@ input:focus-visible, [tabindex]:focus-visible {
   overflow-x: auto; scrollbar-width: none; }
 .st-key-navrail::-webkit-scrollbar { display: none; }
 .st-key-navrail > div { flex: 0 0 auto !important; width: auto !important; }
-.st-key-navrail [data-testid="stPageLink"] a { border-radius: var(--radius-round) !important; padding: 8px 14px !important; margin: 0 !important;
+.st-key-navrail [data-testid="stPageLink"] a { border-radius: var(--radius-round) !important; padding: 8px 12px !important; margin: 0 !important;
   min-height: 40px; background: transparent !important; transition: background var(--motion-base) var(--motion-ease); }
 .st-key-navrail [data-testid="stPageLink"] a p, .st-key-navrail [data-testid="stPageLink"] a span {
   font-size: var(--text-sm) !important; font-weight: var(--weight-semibold); color: var(--nav-item-fg) !important; white-space: nowrap; }
@@ -343,6 +343,8 @@ div[data-testid="stVerticalBlockBorderWrapper"], .stVerticalBlock[data-testid="s
   .mt-pfd svg .flow { animation: none !important; }
 }
 @media (max-width: 1560px) { .mt-chip .nm { display: none; } }
+/* a changed design adds the "changed" badge; drop the design name then so the nav rail keeps every link visible */
+.mt-chip:has(.mod) .nm { display: none; }
 @media (max-width: 1080px) {
   .st-key-navrail { display: none !important; }
   .st-key-navmenu { display: flex !important; }
