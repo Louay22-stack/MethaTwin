@@ -1,0 +1,10 @@
+# Streamlit Community Cloud installs this file (it sits next to app.py). Dashboard only: no DWSIM, pythonnet
+# or report tools. scikit-learn and xgboost must match the versions the surrogates were pickled with.
+numpy==2.4.2
+pandas==2.3.3
+scipy==1.17.1
+scikit-learn==1.8.0
+xgboost==3.2.0
+joblib==1.5.3
+streamlit==1.55.0
+plotly==6.8.0

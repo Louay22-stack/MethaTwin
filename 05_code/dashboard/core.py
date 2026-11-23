@@ -6,8 +6,11 @@ No DWSIM needed: everything here is surrogate-based and takes milliseconds.
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import sys
+import urllib.request
 from dataclasses import replace
 from pathlib import Path
 
@@ -43,10 +46,38 @@ UNITS = {"maize_share": "%", "cive_share": "%", "feed_t_d": "t/d", "hrt_d": "d",
          "p_flash_bar": "bar", "k_dis": "1/d", "K_I_nh3": "M"}
 
 
-def load_surrogate() -> Surrogate:
-    if not MODEL_FILE.exists():
-        raise FileNotFoundError(f"Trained surrogates not found at {MODEL_FILE}. "
+# The trained surrogates (66 MB) are not in Git. On a fresh deployment they are fetched once from the GitHub Release
+# and checked against this fingerprint; locally, retrain with 05_code/step6b_surrogate.py or download the same file.
+MODEL_URL = os.environ.get("METHATWIN_MODEL_URL",
+                           "https://github.com/Louay22-stack/MethaTwin/releases/download/models-v1/surrogates.joblib")
+MODEL_SHA256 = "f57d7f8cef6ed8ab569dc51e01fc40c4ffc50b2347cf0e60ebdcaad60f56491f"
+
+
+def fetch_model() -> None:
+    """Download the surrogates to MODEL_FILE if they are missing; verify the SHA-256 before using them."""
+    if MODEL_FILE.exists():
+        return
+    MODEL_FILE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = MODEL_FILE.with_suffix(".part")
+    h = hashlib.sha256()
+    try:
+        with urllib.request.urlopen(MODEL_URL, timeout=60) as r, open(tmp, "wb") as f:
+            while chunk := r.read(1 << 20):
+                h.update(chunk)
+                f.write(chunk)
+    except OSError as e:
+        tmp.unlink(missing_ok=True)
+        raise FileNotFoundError(f"Trained surrogates not found at {MODEL_FILE}, and the download from {MODEL_URL} "
+                                f"failed ({e}). Run: python 05_code/step6b_surrogate.py") from e
+    if h.hexdigest() != MODEL_SHA256:
+        tmp.unlink(missing_ok=True)
+        raise FileNotFoundError(f"The surrogates downloaded from {MODEL_URL} do not match the expected fingerprint. "
                                 "Run: python 05_code/step6b_surrogate.py")
+    tmp.replace(MODEL_FILE)
+
+
+def load_surrogate() -> Surrogate:
+    fetch_model()
     return Surrogate()
 
 
