@@ -112,3 +112,7 @@ The models are validated against a benchmark, a lab digester and hand calculatio
 ## Data policy
 
 The project uses public data and published literature only. The machine-learning component is a surrogate of a mechanistic model trained on simulated data. No empirical plant data and no unpublished manuscript data are used.
+
+## Licence
+
+The code is released under the [MIT License](LICENSE). The literature data and sources it builds on remain under their original terms; see `01_research/sources.md` and `03_data/DATA_ORIGIN.md`.
